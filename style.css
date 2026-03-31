@@ -442,19 +442,20 @@ a:hover { text-decoration: underline; }
 .tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort="desc"] .tabulator-col-title { color: var(--accent-blue) !important; }
 
 .tabulator-row {
-  background: var(--bg-card) !important;
+  background: #111827 !important;
   border-bottom: 1px solid var(--border) !important;
   color: var(--text-primary) !important;
 }
 .tabulator-row:hover,
-.tabulator-row.tabulator-selected { background: var(--bg-card-hover) !important; }
-.tabulator-row.tabulator-row-even { background: rgba(255,255,255,0.02) !important; }
-.tabulator-row.tabulator-row-even:hover { background: var(--bg-card-hover) !important; }
+.tabulator-row.tabulator-selected { background: #1a2235 !important; }
+.tabulator-row.tabulator-row-even { background: #0d1524 !important; }
+.tabulator-row.tabulator-row-even:hover { background: #1a2235 !important; }
 
 .tabulator-cell {
+  background: transparent !important;
   padding: 10px 12px !important;
   border-right: 1px solid var(--border) !important;
-  color: var(--text-primary) !important;
+  color: #e8eaf0 !important;
 }
 
 /* Tabulator footer/pagination */
