@@ -415,7 +415,7 @@ a:hover { text-decoration: underline; }
 }
 .sidebar-list-item:last-child { border-bottom: none; }
 
-/* ---- Tables (Tabulator overrides) ---- */
+/* ---- Tables (Tabulator midnight theme overrides) ---- */
 .tabulator {
   background: var(--bg-card) !important;
   border: 1px solid var(--border) !important;
@@ -429,7 +429,7 @@ a:hover { text-decoration: underline; }
   border-bottom: 1px solid var(--border-bright) !important;
 }
 .tabulator .tabulator-header .tabulator-col {
-  background: transparent !important;
+  background: var(--bg-nav) !important;
   border-right: 1px solid var(--border) !important;
   color: var(--text-secondary) !important;
   font-size: 11px !important;
@@ -437,19 +437,25 @@ a:hover { text-decoration: underline; }
   text-transform: uppercase !important;
   letter-spacing: 0.06em !important;
 }
-.tabulator .tabulator-header .tabulator-col:hover { background: var(--border) !important; }
-.tabulator .tabulator-header .tabulator-col.tabulator-col-sorter-element:hover { color: var(--accent-blue) !important; }
+.tabulator .tabulator-header .tabulator-col:hover { background: var(--border) !important; color: var(--text-primary) !important; }
+.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort="asc"] .tabulator-col-title,
+.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort="desc"] .tabulator-col-title { color: var(--accent-blue) !important; }
 
 .tabulator-row {
-  background: transparent !important;
+  background: var(--bg-card) !important;
   border-bottom: 1px solid var(--border) !important;
   color: var(--text-primary) !important;
 }
-.tabulator-row:hover { background: var(--bg-card-hover) !important; }
-.tabulator-row.tabulator-row-even { background: rgba(255,255,255,0.015) !important; }
+.tabulator-row:hover,
+.tabulator-row.tabulator-selected { background: var(--bg-card-hover) !important; }
+.tabulator-row.tabulator-row-even { background: rgba(255,255,255,0.02) !important; }
 .tabulator-row.tabulator-row-even:hover { background: var(--bg-card-hover) !important; }
 
-.tabulator-cell { padding: 10px 12px !important; border-right: 1px solid var(--border) !important; }
+.tabulator-cell {
+  padding: 10px 12px !important;
+  border-right: 1px solid var(--border) !important;
+  color: var(--text-primary) !important;
+}
 
 /* Tabulator footer/pagination */
 .tabulator .tabulator-footer {
@@ -462,12 +468,16 @@ a:hover { text-decoration: underline; }
   color: var(--text-primary) !important;
   border: none !important;
   border-radius: 3px !important;
+  margin: 0 2px !important;
 }
 .tabulator .tabulator-footer .tabulator-page.active,
-.tabulator .tabulator-footer .tabulator-page:hover {
+.tabulator .tabulator-footer .tabulator-page:not(.disabled):hover {
   background: var(--accent-blue) !important;
   color: var(--bg-primary) !important;
 }
+.tabulator .tabulator-footer .tabulator-page.disabled { opacity: 0.4 !important; }
+.tabulator .tabulator-footer .tabulator-paginator { color: var(--text-secondary) !important; }
+.tabulator-page-size { background: var(--border) !important; color: var(--text-primary) !important; border: 1px solid var(--border-bright) !important; border-radius: 3px !important; }
 
 /* Tabulator row expansion */
 .tabulator-row .tabulator-responsive-collapse {
@@ -478,7 +488,7 @@ a:hover { text-decoration: underline; }
   font-size: 12px !important;
 }
 
-/* Tabulator search input */
+/* Tabulator header filter input */
 .tabulator-header-filter input {
   background: var(--border) !important;
   color: var(--text-primary) !important;
@@ -488,6 +498,21 @@ a:hover { text-decoration: underline; }
   font-size: 12px !important;
   width: 100% !important;
 }
+.tabulator-header-filter input::placeholder { color: var(--text-secondary) !important; }
+
+/* Multi-value cells */
+.cell-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.cell-tag {
+  background: rgba(0,212,255,0.1);
+  color: var(--accent-blue);
+  border: 1px solid rgba(0,212,255,0.25);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.cell-tag.grey { background: var(--border); color: var(--text-secondary); border-color: var(--border-bright); }
 
 /* Link cells */
 .cell-link {

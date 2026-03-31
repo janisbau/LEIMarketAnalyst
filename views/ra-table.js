@@ -10,23 +10,48 @@ App.views.initRaTable = function() {
   var louName = App.helpers ? App.helpers.louName : function(l) { return l.id; };
   var escHtml = App.helpers ? App.helpers.escHtml : function(s) { return s; };
 
-  var tableData = App.data.ras.map(function(ra) {
-    var attrs = ra.attributes || {};
-    var louLei = ra._louLei;
-    var parentLou = louLei ? App.data.louMap[louLei] : null;
-    var websites = attrs.websites || (attrs.website ? [attrs.website] : []);
+  // Group RA records by company name — one company can be authorized by multiple LOUs
+  // and may have multiple websites. Aggregate all into one table row per company.
+  var byName = {};
 
-    return {
-      id: ra.id,
-      name: attrs.name || ra.id,
-      lei: ra.id || '',
-      parentLouName: parentLou ? louName(parentLou) : (louLei || '—'),
-      parentLouLei: louLei || '',
-      website: websites[0] || '',
-    };
+  App.data.ras.forEach(function(ra) {
+    var attrs = ra.attributes || {};
+    var name = (attrs.name || ra.id || '').trim();
+    var louLei = ra._louLei;
+    var websites = (attrs.websites && attrs.websites.length > 0)
+      ? attrs.websites
+      : (attrs.website ? [attrs.website] : []);
+
+    if (!byName[name]) {
+      byName[name] = {
+        name: name,
+        ids: [],
+        lous: [],    // { lei, name }
+        websites: [],
+      };
+    }
+
+    var group = byName[name];
+
+    // Collect IDs (LEIs or API IDs)
+    if (ra.id && !group.ids.includes(ra.id)) group.ids.push(ra.id);
+
+    // Collect parent LOUs
+    if (louLei && App.data.louMap[louLei]) {
+      var alreadyHas = group.lous.some(function(l) { return l.lei === louLei; });
+      if (!alreadyHas) {
+        group.lous.push({ lei: louLei, name: louName(App.data.louMap[louLei]) });
+      }
+    }
+
+    // Collect unique websites
+    websites.forEach(function(url) {
+      url = url.trim();
+      if (url && !group.websites.includes(url)) group.websites.push(url);
+    });
   });
 
-  // Sort alphabetically by name
+  var tableData = Object.values(byName);
   tableData.sort(function(a, b) { return a.name.localeCompare(b.name); });
 
   new Tabulator('#ra-table', {
@@ -52,38 +77,56 @@ App.views.initRaTable = function() {
       },
       {
         title: 'LEI / ID',
-        field: 'lei',
-        sorter: 'string',
+        field: 'ids',
         widthGrow: 2,
         responsive: 3,
+        sorter: function(a, b) {
+          return (a[0] || '').localeCompare(b[0] || '');
+        },
         formatter: function(cell) {
-          var v = cell.getValue();
-          if (!v) return '<span style="color:var(--text-secondary)">—</span>';
-          return '<span style="font-family:monospace;font-size:11px;color:var(--text-secondary)">' + escHtml(v) + '</span>';
+          var ids = cell.getValue();
+          if (!ids || ids.length === 0) return '<span style="color:var(--text-secondary)">—</span>';
+          return ids.map(function(id) {
+            return '<span style="font-family:monospace;font-size:11px;color:var(--text-secondary);display:block">' + escHtml(id) + '</span>';
+          }).join('');
         },
       },
       {
-        title: 'Parent LOU',
-        field: 'parentLouName',
-        sorter: 'string',
+        title: 'Parent LOU(s)',
+        field: 'lous',
+        sorter: function(a, b) {
+          return (a[0] ? a[0].name : '').localeCompare(b[0] ? b[0].name : '');
+        },
         headerFilter: 'input',
+        headerFilterFunc: function(headerValue, rowValue) {
+          var q = headerValue.toLowerCase();
+          return rowValue.some(function(l) { return l.name.toLowerCase().includes(q); });
+        },
         headerFilterPlaceholder: 'Filter LOU...',
         widthGrow: 2.5,
         formatter: function(cell) {
-          var row = cell.getRow().getData();
-          if (!row.parentLouLei) return '<span style="color:var(--text-secondary)">—</span>';
-          return '<span style="color:var(--accent-blue)">' + escHtml(cell.getValue()) + '</span>';
+          var lous = cell.getValue();
+          if (!lous || lous.length === 0) return '<span style="color:var(--text-secondary)">—</span>';
+          return '<div class="cell-tags">' + lous.map(function(l) {
+            return '<span class="cell-tag">' + escHtml(l.name) + '</span>';
+          }).join('') + '</div>';
         },
       },
       {
-        title: 'Website',
-        field: 'website',
-        widthGrow: 2,
+        title: 'Website(s)',
+        field: 'websites',
+        widthGrow: 2.5,
         responsive: 2,
+        sorter: function(a, b) {
+          return (a[0] || '').localeCompare(b[0] || '');
+        },
         formatter: function(cell) {
-          var v = cell.getValue();
-          if (!v) return '<span style="color:var(--text-secondary)">—</span>';
-          return '<a class="cell-link" href="' + escHtml(v) + '" target="_blank" rel="noopener">↗ ' + escHtml(v.replace(/^https?:\/\//, '').replace(/\/$/, '')) + '</a>';
+          var urls = cell.getValue();
+          if (!urls || urls.length === 0) return '<span style="color:var(--text-secondary)">—</span>';
+          return urls.map(function(url) {
+            var label = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+            return '<a class="cell-link" style="display:block" href="' + escHtml(url) + '" target="_blank" rel="noopener">↗ ' + escHtml(label) + '</a>';
+          }).join('');
         },
       },
     ],
