@@ -1,0 +1,62 @@
+name: Update LEI Statistics
+
+on:
+  schedule:
+    # Run daily at 08:00 UTC (after GLEIF's 02:00/06:00 UTC delta publications)
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+    # Adds a "Run workflow" button in GitHub Actions UI for manual testing
+
+jobs:
+  update-stats:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to commit back to the repo
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download GLEIF LastDay delta
+        run: |
+          echo "Downloading GLEIF Golden Copy LastDay delta..."
+          curl -L --retry 3 --retry-delay 5 -o delta.zip \
+            "https://goldencopy-next.gleif.org/api/v2/golden-copies/publishes/lei2/latest.csv?delta=LastDay"
+          echo "Download complete. File size: $(du -sh delta.zip | cut -f1)"
+
+      - name: Unzip delta
+        run: |
+          mkdir -p delta
+          unzip -o delta.zip -d delta/
+          echo "Extracted files:"
+          ls -lh delta/
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Process delta with Python
+        run: |
+          python scripts/process_delta.py
+
+      - name: Show generated files
+        run: |
+          echo "=== daily-stats.json ==="
+          cat data/daily-stats.json | python3 -c "import sys,json; d=json.load(sys.stdin); print(f'Date: {d[\"date\"]}, Total: {d[\"totalDelta\"]:,}, LOUs: {len(d[\"byLou\"])}, Countries: {len(d[\"byCountry\"])}')"
+          echo "=== history.json entry count ==="
+          cat data/history.json | python3 -c "import sys,json; h=json.load(sys.stdin); print(f'{len(h)} entries')"
+
+      - name: Commit and push stats
+        run: |
+          git config user.name "lei-market-bot"
+          git config user.email "actions@github.com"
+          git add data/daily-stats.json data/history.json
+          # Only commit if there are actual changes
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: update LEI stats $(date +%Y-%m-%d)"
+            git push
+            echo "Changes committed and pushed."
+          fi
