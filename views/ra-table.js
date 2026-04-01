@@ -3,15 +3,16 @@
 window.App = window.App || {};
 App.views = App.views || {};
 
+var _raTable = null;
+
 App.views.initRaTable = function() {
   var el = document.getElementById('ra-table');
   if (!el) return;
 
   var louName = App.helpers ? App.helpers.louName : function(l) { return l.id; };
-  var escHtml = App.helpers ? App.helpers.escHtml : function(s) { return s; };
+  var escHtml = App.helpers ? App.helpers.escHtml : function(s) { return String(s); };
 
-  // Group RA records by company name — one company can be authorized by multiple LOUs
-  // and may have multiple websites. Aggregate all into one table row per company.
+  // Group RA records by company name
   var byName = {};
 
   App.data.ras.forEach(function(ra) {
@@ -23,20 +24,12 @@ App.views.initRaTable = function() {
       : (attrs.website ? [attrs.website] : []);
 
     if (!byName[name]) {
-      byName[name] = {
-        name: name,
-        ids: [],
-        lous: [],    // { lei, name }
-        websites: [],
-      };
+      byName[name] = { name: name, ids: [], lous: [], websites: [], louCount: 0 };
     }
 
     var group = byName[name];
+    if (ra.id && group.ids.indexOf(ra.id) === -1) group.ids.push(ra.id);
 
-    // Collect IDs (LEIs or API IDs)
-    if (ra.id && !group.ids.includes(ra.id)) group.ids.push(ra.id);
-
-    // Collect parent LOUs
     if (louLei && App.data.louMap[louLei]) {
       var alreadyHas = group.lous.some(function(l) { return l.lei === louLei; });
       if (!alreadyHas) {
@@ -44,17 +37,42 @@ App.views.initRaTable = function() {
       }
     }
 
-    // Collect unique websites
     websites.forEach(function(url) {
       url = url.trim();
-      if (url && !group.websites.includes(url)) group.websites.push(url);
+      if (url && group.websites.indexOf(url) === -1) group.websites.push(url);
     });
   });
 
-  var tableData = Object.values(byName);
+  var tableData = Object.values(byName).map(function(row) {
+    row.louCount = row.lous.length;
+    row.loyalty = row.louCount === 1 ? 'Exclusive' : row.louCount === 2 ? 'Dual' : 'Multi';
+    return row;
+  });
+
   tableData.sort(function(a, b) { return a.name.localeCompare(b.name); });
 
-  new Tabulator('#ra-table', {
+  // Wire export button
+  var exportBtn = document.getElementById('ra-export-btn');
+  if (exportBtn) {
+    exportBtn.onclick = function() {
+      if (_raTable) _raTable.download('csv', 'ra-directory.csv');
+    };
+  }
+
+  // Wire multi-LOU filter toggle
+  var multiFilter = document.getElementById('ra-multi-filter');
+  if (multiFilter) {
+    multiFilter.addEventListener('change', function() {
+      if (!_raTable) return;
+      if (multiFilter.checked) {
+        _raTable.setFilter(function(row) { return row.louCount >= 2; });
+      } else {
+        _raTable.clearFilter(true);
+      }
+    });
+  }
+
+  _raTable = new Tabulator('#ra-table', {
     data: tableData,
     layout: 'fitColumns',
     responsiveLayout: 'hide',
@@ -76,19 +94,15 @@ App.views.initRaTable = function() {
         },
       },
       {
-        title: 'LEI / ID',
-        field: 'ids',
-        widthGrow: 2,
-        responsive: 3,
-        sorter: function(a, b) {
-          return (a[0] || '').localeCompare(b[0] || '');
-        },
+        title: 'Loyalty',
+        field: 'loyalty',
+        sorter: 'string',
+        hozAlign: 'center',
+        widthGrow: 0.8,
         formatter: function(cell) {
-          var ids = cell.getValue();
-          if (!ids || ids.length === 0) return '<span style="color:var(--text-secondary)">—</span>';
-          return ids.map(function(id) {
-            return '<span style="font-family:monospace;font-size:11px;color:var(--text-secondary);display:block">' + escHtml(id) + '</span>';
-          }).join('');
+          var v = cell.getValue();
+          var cls = v === 'Exclusive' ? 'exclusive' : v === 'Dual' ? 'dual' : 'multi';
+          return '<span class="loyalty-badge ' + cls + '">' + escHtml(v) + '</span>';
         },
       },
       {
@@ -100,15 +114,15 @@ App.views.initRaTable = function() {
         headerFilter: 'input',
         headerFilterFunc: function(headerValue, rowValue) {
           var q = headerValue.toLowerCase();
-          return rowValue.some(function(l) { return l.name.toLowerCase().includes(q); });
+          return rowValue.some(function(l) { return l.name.toLowerCase().indexOf(q) !== -1; });
         },
         headerFilterPlaceholder: 'Filter LOU...',
         widthGrow: 2.5,
         formatter: function(cell) {
           var lous = cell.getValue();
-          if (!lous || lous.length === 0) return '<span style="color:var(--text-secondary)">—</span>';
+          if (!lous || lous.length === 0) return '<span style="color:var(--text-secondary)">\u2014</span>';
           return '<div class="cell-tags">' + lous.map(function(l) {
-            return '<span class="cell-tag">' + escHtml(l.name) + '</span>';
+            return '<span class="cell-tag" style="cursor:pointer" onclick="App.views.showLouProfile && App.views.showLouProfile(\'' + escHtml(l.lei) + '\')">' + escHtml(l.name) + '</span>';
           }).join('') + '</div>';
         },
       },
@@ -117,15 +131,13 @@ App.views.initRaTable = function() {
         field: 'websites',
         widthGrow: 2.5,
         responsive: 2,
-        sorter: function(a, b) {
-          return (a[0] || '').localeCompare(b[0] || '');
-        },
+        sorter: function(a, b) { return (a[0] || '').localeCompare(b[0] || ''); },
         formatter: function(cell) {
           var urls = cell.getValue();
-          if (!urls || urls.length === 0) return '<span style="color:var(--text-secondary)">—</span>';
+          if (!urls || urls.length === 0) return '<span style="color:var(--text-secondary)">\u2014</span>';
           return urls.map(function(url) {
             var label = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
-            return '<a class="cell-link" style="display:block" href="' + escHtml(url) + '" target="_blank" rel="noopener">↗ ' + escHtml(label) + '</a>';
+            return '<a class="cell-link" style="display:block" href="' + escHtml(url) + '" target="_blank" rel="noopener">\u2197 ' + escHtml(label) + '</a>';
           }).join('');
         },
       },

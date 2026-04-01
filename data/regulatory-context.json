@@ -1,0 +1,211 @@
+{
+  "EU": {
+    "name": "European Union",
+    "regulations": [
+      { "name": "MiFID II", "year": 2018, "mandatory": true, "scope": "Investment firms, financial instruments" },
+      { "name": "EMIR", "year": 2012, "mandatory": true, "scope": "Derivatives counterparties" },
+      { "name": "SFTR", "year": 2020, "mandatory": true, "scope": "Securities financing transactions" },
+      { "name": "MMSR", "year": 2016, "mandatory": true, "scope": "Money market statistics reporting" }
+    ],
+    "adoptionLevel": "HIGH",
+    "estimatedEntities": 500000
+  },
+  "US": {
+    "name": "United States",
+    "regulations": [
+      { "name": "Dodd-Frank (CFTC)", "year": 2012, "mandatory": true, "scope": "OTC derivatives swap dealers" },
+      { "name": "SEC Rule 13H-1", "year": 2012, "mandatory": false, "scope": "Large traders (encouraged)" }
+    ],
+    "adoptionLevel": "HIGH",
+    "estimatedEntities": 400000
+  },
+  "GB": {
+    "name": "United Kingdom",
+    "regulations": [
+      { "name": "UK MiFID (onshored)", "year": 2021, "mandatory": true, "scope": "UK investment firms" },
+      { "name": "UK EMIR", "year": 2019, "mandatory": true, "scope": "UK derivatives counterparties" }
+    ],
+    "adoptionLevel": "HIGH",
+    "estimatedEntities": 150000
+  },
+  "CH": {
+    "name": "Switzerland",
+    "regulations": [
+      { "name": "FinFraG / FMIA", "year": 2016, "mandatory": true, "scope": "Derivatives reporting" },
+      { "name": "FinSA", "year": 2020, "mandatory": true, "scope": "Financial services providers" }
+    ],
+    "adoptionLevel": "HIGH",
+    "estimatedEntities": 50000
+  },
+  "AU": {
+    "name": "Australia",
+    "regulations": [
+      { "name": "ASIC Derivative Rules", "year": 2013, "mandatory": true, "scope": "OTC derivative reporting entities" }
+    ],
+    "adoptionLevel": "MEDIUM",
+    "estimatedEntities": 40000
+  },
+  "CA": {
+    "name": "Canada",
+    "regulations": [
+      { "name": "CSA Derivatives Reporting", "year": 2014, "mandatory": true, "scope": "Derivatives counterparties" }
+    ],
+    "adoptionLevel": "MEDIUM",
+    "estimatedEntities": 35000
+  },
+  "JP": {
+    "name": "Japan",
+    "regulations": [
+      { "name": "FIEL (FSA)", "year": 2012, "mandatory": true, "scope": "OTC derivatives reporting" }
+    ],
+    "adoptionLevel": "MEDIUM",
+    "estimatedEntities": 60000
+  },
+  "SG": {
+    "name": "Singapore",
+    "regulations": [
+      { "name": "MAS OTC Derivatives Reporting", "year": 2013, "mandatory": true, "scope": "Financial institutions" }
+    ],
+    "adoptionLevel": "MEDIUM",
+    "estimatedEntities": 20000
+  },
+  "HK": {
+    "name": "Hong Kong",
+    "regulations": [
+      { "name": "SFO OTC Reporting", "year": 2015, "mandatory": true, "scope": "Authorized institutions" }
+    ],
+    "adoptionLevel": "MEDIUM",
+    "estimatedEntities": 15000
+  },
+  "IN": {
+    "name": "India",
+    "regulations": [
+      { "name": "SEBI/RBI LEI Directive", "year": 2017, "mandatory": true, "scope": "Large corporates, financial market participants" }
+    ],
+    "adoptionLevel": "MEDIUM",
+    "estimatedEntities": 80000
+  },
+  "BR": {
+    "name": "Brazil",
+    "regulations": [
+      { "name": "BCB Resolution 4.659", "year": 2018, "mandatory": true, "scope": "Financial system participants" }
+    ],
+    "adoptionLevel": "LOW",
+    "estimatedEntities": 30000
+  },
+  "ZA": {
+    "name": "South Africa",
+    "regulations": [
+      { "name": "FSCA Derivatives Reporting", "year": 2018, "mandatory": true, "scope": "OTC derivatives" }
+    ],
+    "adoptionLevel": "LOW",
+    "estimatedEntities": 8000
+  },
+  "MX": {
+    "name": "Mexico",
+    "regulations": [
+      { "name": "CNBV Reporting Requirements", "year": 2017, "mandatory": false, "scope": "Financial entities (encouraged)" }
+    ],
+    "adoptionLevel": "LOW",
+    "estimatedEntities": 5000
+  },
+  "DE": {
+    "name": "Germany",
+    "regulations": [
+      { "name": "MiFID II (via EU)", "year": 2018, "mandatory": true, "scope": "Investment firms" },
+      { "name": "WpHG", "year": 2018, "mandatory": true, "scope": "Securities trading reporting" }
+    ],
+    "adoptionLevel": "HIGH",
+    "estimatedEntities": 120000
+  },
+  "FR": {
+    "name": "France",
+    "regulations": [
+      { "name": "MiFID II (via EU)", "year": 2018, "mandatory": true, "scope": "Investment firms" },
+      { "name": "AMF Reporting", "year": 2018, "mandatory": true, "scope": "Fund managers" }
+    ],
+    "adoptionLevel": "HIGH",
+    "estimatedEntities": 90000
+  },
+  "NL": {
+    "name": "Netherlands",
+    "regulations": [
+      { "name": "MiFID II (via EU)", "year": 2018, "mandatory": true, "scope": "Investment firms" },
+      { "name": "EMIR (via EU)", "year": 2012, "mandatory": true, "scope": "Derivatives" }
+    ],
+    "adoptionLevel": "HIGH",
+    "estimatedEntities": 70000
+  },
+  "LU": {
+    "name": "Luxembourg",
+    "regulations": [
+      { "name": "MiFID II / EMIR (via EU)", "year": 2018, "mandatory": true, "scope": "Fund industry" }
+    ],
+    "adoptionLevel": "HIGH",
+    "estimatedEntities": 40000
+  },
+  "IE": {
+    "name": "Ireland",
+    "regulations": [
+      { "name": "MiFID II / EMIR (via EU)", "year": 2018, "mandatory": true, "scope": "Financial services sector" }
+    ],
+    "adoptionLevel": "HIGH",
+    "estimatedEntities": 30000
+  },
+  "SE": {
+    "name": "Sweden",
+    "regulations": [
+      { "name": "MiFID II (via EU)", "year": 2018, "mandatory": true, "scope": "Investment firms" }
+    ],
+    "adoptionLevel": "HIGH",
+    "estimatedEntities": 25000
+  },
+  "NO": {
+    "name": "Norway",
+    "regulations": [
+      { "name": "MiFID II (EEA)", "year": 2018, "mandatory": true, "scope": "Investment firms" }
+    ],
+    "adoptionLevel": "HIGH",
+    "estimatedEntities": 15000
+  },
+  "PL": {
+    "name": "Poland",
+    "regulations": [
+      { "name": "MiFID II (via EU)", "year": 2018, "mandatory": true, "scope": "Investment firms" }
+    ],
+    "adoptionLevel": "MEDIUM",
+    "estimatedEntities": 20000
+  },
+  "AE": {
+    "name": "UAE",
+    "regulations": [
+      { "name": "CBUAE Circular", "year": 2020, "mandatory": false, "scope": "Financial institutions (encouraged)" }
+    ],
+    "adoptionLevel": "LOW",
+    "estimatedEntities": 10000
+  },
+  "KR": {
+    "name": "South Korea",
+    "regulations": [
+      { "name": "FSC OTC Derivatives Reporting", "year": 2014, "mandatory": true, "scope": "Derivatives counterparties" }
+    ],
+    "adoptionLevel": "LOW",
+    "estimatedEntities": 12000
+  },
+  "CN": {
+    "name": "China",
+    "regulations": [
+      { "name": "PBOC / NAFMII Guidelines", "year": 2017, "mandatory": false, "scope": "Financial institutions (voluntary)" }
+    ],
+    "adoptionLevel": "LOW",
+    "estimatedEntities": 8000
+  },
+  "RU": {
+    "name": "Russia",
+    "regulations": [
+      { "name": "Bank of Russia Directive", "year": 2018, "mandatory": true, "scope": "OTC derivatives" }
+    ],
+    "adoptionLevel": "LOW",
+    "estimatedEntities": 6000
+  }
+}

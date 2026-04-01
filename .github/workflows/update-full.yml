@@ -1,0 +1,63 @@
+name: Update Full Market Share (Monthly)
+
+on:
+  schedule:
+    # 1st of each month at 07:00 UTC — after daily pipeline has run
+    - cron: '0 7 1 * *'
+  workflow_dispatch:
+    # Manual trigger: Actions → "Update Full Market Share" → Run workflow
+
+jobs:
+  update-full:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download GLEIF full Golden Copy (latest)
+        run: |
+          echo "Downloading full GLEIF Golden Copy CSV (no delta)..."
+          mkdir -p full
+          curl -L --retry 3 --retry-delay 10 -o full.zip \
+            "https://goldencopy-next.gleif.org/api/v2/golden-copies/publishes/lei2/latest.csv"
+          echo "Download complete. Size: $(du -sh full.zip | cut -f1)"
+          unzip -o full.zip -d full/
+          echo "Extracted:"
+          ls -lh full/
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Process full Golden Copy
+        run: python scripts/process_full.py
+
+      - name: Show results
+        run: |
+          echo "=== market-share.json ==="
+          python3 -c "
+          import json
+          with open('data/market-share.json') as f: d=json.load(f)
+          total = d.get('totalActive') or 0
+          lous = len(d.get('byLou', {}))
+          print(f'Date: {d[\"date\"]}, Active LEIs: {total:,}, LOUs: {lous}')
+          "
+
+      - name: Commit results
+        run: |
+          git config user.name "lei-market-bot"
+          git config user.email "actions@github.com"
+          git add data/market-share.json data/market-share-history.json \
+                  data/entity-types.json data/renewal-pipeline.json \
+                  data/lou-home-countries.json
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: update full market share $(date +%Y-%m)"
+            git push
+            echo "Committed and pushed."
+          fi

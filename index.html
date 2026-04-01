@@ -4,35 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LEI Market Analyzer</title>
-
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-
-  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-
-  <!-- Tabulator (midnight = dark built-in theme) -->
   <link rel="stylesheet" href="https://unpkg.com/tabulator-tables@6.2.1/dist/css/tabulator_midnight.min.css">
-
-  <!-- vis.js Network (no separate CSS needed for standalone build) -->
-
-  <!-- App styles -->
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 
-  <!-- Loading overlay shown during boot -->
+  <!-- Loading overlay -->
   <div id="loading-overlay">
     <div class="loading-inner">
       <div class="loading-spinner"></div>
-      <div class="loading-title">LEI Market Analyzer</div>
+      <div class="loading-title">LEI<span style="color:#00d4ff">Market</span></div>
       <div class="loading-sub" id="loading-message">Connecting to GLEIF API...</div>
     </div>
   </div>
 
-  <!-- Top navigation bar -->
+  <!-- Navigation -->
   <nav id="main-nav">
     <div class="nav-brand">
       <span class="nav-brand-icon">&#9670;</span>
@@ -41,20 +31,25 @@
     <div class="nav-tabs">
       <button class="nav-tab active" data-view="dashboard">Dashboard</button>
       <button class="nav-tab" data-view="map">World Map</button>
-      <button class="nav-tab" data-view="network">Network Graph</button>
-      <button class="nav-tab" data-view="lous">LOU Directory</button>
-      <button class="nav-tab" data-view="ras">RA Directory</button>
+      <button class="nav-tab" data-view="network">Network</button>
+      <button class="nav-tab" data-view="lous">LOUs</button>
+      <button class="nav-tab" data-view="ras">Agents</button>
       <button class="nav-tab" data-view="trends">Trends</button>
+      <button class="nav-tab nav-tab-intelligence" data-view="intelligence">Intelligence</button>
     </div>
-    <div class="nav-meta" id="nav-meta">
+    <div class="nav-search-wrap">
+      <input id="global-search" type="text" placeholder="&#128269; Search LOUs, RAs, countries..." autocomplete="off">
+      <div id="search-dropdown" class="hidden"></div>
+    </div>
+    <div class="nav-meta">
       <span class="data-freshness" id="data-freshness"></span>
     </div>
   </nav>
 
-  <!-- Main content area -->
+  <!-- Main content -->
   <main id="main-content">
 
-    <!-- View: Dashboard -->
+    <!-- Dashboard -->
     <section id="view-dashboard" class="view-section active">
       <div class="view-header">
         <h1>Global LEI Market</h1>
@@ -74,23 +69,29 @@
       </div>
     </section>
 
-    <!-- View: World Map -->
+    <!-- World Map -->
     <section id="view-map" class="view-section">
       <div class="view-header">
         <h1>Geographic Coverage</h1>
         <p class="view-subtitle">Countries where LEI issuers (LOUs) are accredited to operate</p>
       </div>
-      <div class="map-legend" id="map-legend">
-        <span class="legend-label">LOUs active:</span>
-        <span class="legend-item" style="background:#1e2a3a">0</span>
-        <span class="legend-item" style="background:#0d47a1">1</span>
-        <span class="legend-item" style="background:#1976d2">2</span>
-        <span class="legend-item" style="background:#00d4ff; color:#0a0e1a">3+</span>
+      <div class="map-toolbar">
+        <div class="map-legend" id="map-legend">
+          <span class="legend-label">LOUs active:</span>
+          <span class="legend-item" style="background:#1e2a3a">0</span>
+          <span class="legend-item" style="background:#0d47a1">1</span>
+          <span class="legend-item" style="background:#1976d2">2</span>
+          <span class="legend-item" style="background:#00d4ff;color:#0a0e1a">3+</span>
+        </div>
+        <div class="map-mode-toggle">
+          <button class="map-mode-btn active" data-mode="coverage">Coverage</button>
+          <button class="map-mode-btn" data-mode="opportunity">Opportunity</button>
+        </div>
       </div>
       <div id="world-map"></div>
     </section>
 
-    <!-- View: Network Graph -->
+    <!-- Network Graph -->
     <section id="view-network" class="view-section">
       <div class="view-header">
         <h1>RA &harr; LOU Network</h1>
@@ -105,25 +106,35 @@
       </div>
     </section>
 
-    <!-- View: LOU Directory -->
+    <!-- LOU Directory -->
     <section id="view-lous" class="view-section">
       <div class="view-header">
         <h1>LOU Directory</h1>
         <p class="view-subtitle">All accredited Local Operating Units (LEI issuers)</p>
       </div>
+      <div class="table-toolbar">
+        <button id="lou-export-btn" class="toolbar-btn">&#8595; Export CSV</button>
+        <button id="lou-compare-btn" class="toolbar-btn toolbar-btn-accent hidden">Compare Selected (<span id="compare-count">0</span>)</button>
+      </div>
       <div id="lou-table"></div>
     </section>
 
-    <!-- View: RA Directory -->
+    <!-- RA Directory -->
     <section id="view-ras" class="view-section">
       <div class="view-header">
         <h1>Registration Agent Directory</h1>
         <p class="view-subtitle">All registered agents that distribute LEI services on behalf of LOUs</p>
       </div>
+      <div class="table-toolbar">
+        <button id="ra-export-btn" class="toolbar-btn">&#8595; Export CSV</button>
+        <label class="toolbar-toggle">
+          <input type="checkbox" id="ra-multi-filter"> Multi-LOU agents only
+        </label>
+      </div>
       <div id="ra-table"></div>
     </section>
 
-    <!-- View: Trends -->
+    <!-- Trends -->
     <section id="view-trends" class="view-section">
       <div class="view-header">
         <h1>Market Trends</h1>
@@ -131,60 +142,94 @@
       </div>
       <div class="chart-row">
         <div class="chart-card wide">
-          <div class="chart-card-header">
-            <span class="chart-title">Daily New LEIs — Last 90 Days</span>
-          </div>
-          <div class="chart-container">
-            <canvas id="trends-daily-chart"></canvas>
-          </div>
+          <div class="chart-card-header"><span class="chart-title">Daily New LEIs — Last 90 Days</span></div>
+          <div class="chart-container"><canvas id="trends-daily-chart"></canvas></div>
         </div>
       </div>
       <div class="chart-row two-col">
         <div class="chart-card">
-          <div class="chart-card-header">
-            <span class="chart-title">Top LOUs by 30-Day Volume</span>
-          </div>
-          <div class="chart-container tall">
-            <canvas id="trends-lou-chart"></canvas>
-          </div>
+          <div class="chart-card-header"><span class="chart-title">Top LOUs by 30-Day Volume</span></div>
+          <div class="chart-container tall"><canvas id="trends-lou-chart"></canvas></div>
         </div>
         <div class="chart-card">
-          <div class="chart-card-header">
-            <span class="chart-title">Top Countries by 30-Day Volume</span>
-          </div>
-          <div class="chart-container tall">
-            <canvas id="trends-country-chart"></canvas>
-          </div>
+          <div class="chart-card-header"><span class="chart-title">Top Countries by 30-Day Volume</span></div>
+          <div class="chart-container tall"><canvas id="trends-country-chart"></canvas></div>
         </div>
       </div>
       <div class="chart-row">
         <div class="chart-card wide">
-          <div class="chart-card-header">
-            <span class="chart-title">LOU Accreditation Timeline (cumulative)</span>
-          </div>
-          <div class="chart-container">
-            <canvas id="trends-accreditation-chart"></canvas>
-          </div>
+          <div class="chart-card-header"><span class="chart-title">LOU Accreditation Timeline (cumulative)</span></div>
+          <div class="chart-container"><canvas id="trends-accreditation-chart"></canvas></div>
         </div>
       </div>
+      <!-- Charts 5 & 6 injected dynamically by trends.js -->
+    </section>
+
+    <!-- Intelligence -->
+    <section id="view-intelligence" class="view-section">
+      <div class="view-header">
+        <h1>Market Intelligence</h1>
+        <p class="view-subtitle">Opportunity scoring, whitespace analysis, regulatory context, and competitive signals</p>
+      </div>
+      <div id="intelligence-content"></div>
     </section>
 
   </main>
 
-  <!-- Scripts: CDN libraries first, then app code in dependency order -->
+  <!-- LOU Profile Overlay (full-screen, slides in) -->
+  <div id="lou-profile-overlay" class="hidden">
+    <div class="profile-header">
+      <div class="profile-title-wrap">
+        <span class="profile-type-badge">LOU</span>
+        <h2 id="profile-name" class="profile-name"></h2>
+        <span id="profile-lei" class="profile-lei"></span>
+      </div>
+      <button id="profile-close" class="profile-close">&times; Close</button>
+    </div>
+    <div class="profile-tabs">
+      <button class="profile-tab active" data-ptab="overview">Overview</button>
+      <button class="profile-tab" data-ptab="ras">RA Network</button>
+      <button class="profile-tab" data-ptab="geo">Geography</button>
+      <button class="profile-tab" data-ptab="trends">Trends</button>
+    </div>
+    <div id="profile-body" class="profile-body"></div>
+  </div>
+
+  <!-- Comparison Modal -->
+  <div id="comparison-modal" class="hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-box">
+      <div class="modal-header">
+        <span class="modal-title">LOU Comparison</span>
+        <button id="comparison-close" class="sidebar-close">&times;</button>
+      </div>
+      <div id="comparison-content"></div>
+    </div>
+  </div>
+
+  <!-- Comparison sticky bar -->
+  <div id="comparison-bar" class="hidden">
+    <span id="comparison-bar-label">0 LOUs selected</span>
+    <button id="comparison-bar-compare" class="toolbar-btn toolbar-btn-accent">Compare</button>
+    <button id="comparison-bar-clear" class="toolbar-btn">Clear</button>
+  </div>
+
+  <!-- Scripts: CDN libs first, then app code -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://unpkg.com/tabulator-tables@6.2.1/dist/js/tabulator.min.js"></script>
   <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 
-  <!-- App code — order matters -->
   <script src="api.js"></script>
+  <script src="views/intelligence.js"></script>
   <script src="views/dashboard.js"></script>
   <script src="views/map.js"></script>
   <script src="views/network.js"></script>
   <script src="views/lou-table.js"></script>
   <script src="views/ra-table.js"></script>
   <script src="views/trends.js"></script>
+  <script src="views/lou-profile.js"></script>
+  <script src="views/comparison.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

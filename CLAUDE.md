@@ -218,6 +218,35 @@ The user requested a professional fintech style similar to NASDAQ. The dark navy
 
 ## Session History
 
+### Session 2 — Full requirements implementation (2026-03-31)
+Implemented all 21 strategic requirements (REQ-01 to REQ-21) identified in the gap analysis:
+
+**Data pipeline additions (REQ-01, REQ-02, REQ-04, REQ-05, REQ-06, REQ-09, REQ-17, REQ-18):**
+- `scripts/process_delta.py` — added `byLouByCountry`, `byLouStatus`, `transfers.outflows`, `statusBreakdown` per-day aggregations
+- `scripts/process_full.py` — new full Golden Copy processor (streaming CSV): writes `market-share.json`, `market-share-history.json`, `entity-types.json`, `renewal-pipeline.json`, `lou-home-countries.json`
+- `.github/workflows/update-full.yml` — monthly workflow (1st of month, 07:00 UTC) for full Golden Copy processing
+
+**New data files (REQ-03, REQ-07, REQ-08, REQ-21):**
+- `data/regulatory-context.json` — static file with 25 jurisdictions, regulations, adoption levels
+- Placeholder files for all 5 pipeline-generated JSON files
+
+**Frontend — new views:**
+- `views/intelligence.js` — Market Intelligence tab: insight bullets, country opportunity scores (0-100), whitespace countries, RA coverage gaps, regulatory context table
+- `views/lou-profile.js` — Full-screen LOU profile overlay: 4 tabs (Overview, RA Network, Geography, Trends), KPI grid, status breakdown bar, renewal pipeline, market share history chart
+- `views/comparison.js` — Side-by-side LOU comparison modal (up to 4 LOUs), horizontal bar chart
+
+**Frontend — updated views:**
+- `views/map.js` — Added Coverage/Opportunity mode toggle; opportunity colors by composite score; popup shows opportunity score badge; LOU names in popups link to profile
+- `views/lou-table.js` — Added Market Share % and Lapse Rate columns; compare checkbox column; CSV export; LOU name clicks open profile overlay
+- `views/ra-table.js` — Added Loyalty column (Exclusive/Dual/Multi); multi-LOU filter toggle; CSV export; LOU tags in rows link to profiles
+- `views/trends.js` — Added Chart 5 (Market Share Over Time, top 5 LOUs) and Chart 6 (Status Breakdown stacked bar, last 90 days)
+- `views/network.js` — RA node size/color weighted by estimated activity; "View Full Profile" button in LOU sidebar; "View Parent LOU Profile" button in RA sidebar
+- `app.js` — Global search (LOUs/RAs/countries, max 8 results, category badges, click-to-navigate); Intelligence tab routing
+
+**CSS (v=6):** Added search-result-label/sub, status-seg, profile-insight, profile-kpi KPI aliases.
+
+**`api.js`:** Extended `App.data` with 6 new fields; `loadLocalStats()` loads all 8 JSON files in parallel; proxy `louHomeCountries` from jurisdictions when pipeline not yet run.
+
 ### Session 1 — Initial build (2026-03-31)
 Built the entire application from scratch based on the approved plan:
 - Project scaffold: `index.html`, `style.css`, `api.js`, `app.js`

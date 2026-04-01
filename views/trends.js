@@ -8,6 +8,8 @@ App.views.initTrends = function() {
   renderLouVolumeChart();
   renderCountryVolumeChart();
   renderAccreditationChart();
+  renderMarketShareHistoryChart();
+  renderStatusBreakdownChart();
 };
 
 function renderDailyChart() {
@@ -38,9 +40,7 @@ function renderDailyChart() {
       }],
     },
     options: App.chartDefaults({
-      scales: {
-        x: { ticks: { maxTicksLimit: 15, maxRotation: 0 } },
-      },
+      scales: { x: { ticks: { maxTicksLimit: 15, maxRotation: 0 } } },
     }),
   });
 }
@@ -57,7 +57,6 @@ function renderLouVolumeChart() {
     return;
   }
 
-  // Aggregate by LOU over last 30 days
   var louTotals = {};
   last30.forEach(function(day) {
     if (!day.byLou) return;
@@ -66,7 +65,6 @@ function renderLouVolumeChart() {
     });
   });
 
-  // Sort and take top 15
   var sorted = Object.keys(louTotals)
     .map(function(lei) { return { lei: lei, count: louTotals[lei] }; })
     .sort(function(a, b) { return b.count - a.count; })
@@ -75,7 +73,7 @@ function renderLouVolumeChart() {
   var louName = App.helpers ? App.helpers.louName : function(l) { return l.id; };
   var labels = sorted.map(function(item) {
     var lou = App.data.louMap[item.lei];
-    return lou ? shortName(louName(lou)) : item.lei.substring(0, 12) + '…';
+    return lou ? shortName(louName(lou)) : item.lei.substring(0, 12) + '\u2026';
   });
 
   new Chart(canvas, {
@@ -93,10 +91,7 @@ function renderLouVolumeChart() {
     },
     options: App.chartDefaults({
       indexAxis: 'y',
-      scales: {
-        x: {},
-        y: { ticks: { font: { size: 11 } } },
-      },
+      scales: { x: {}, y: { ticks: { font: { size: 11 } } } },
     }),
   });
 }
@@ -141,10 +136,7 @@ function renderCountryVolumeChart() {
     },
     options: App.chartDefaults({
       indexAxis: 'y',
-      scales: {
-        x: {},
-        y: { ticks: { font: { size: 11 } } },
-      },
+      scales: { x: {}, y: { ticks: { font: { size: 11 } } } },
     }),
   });
 }
@@ -154,8 +146,6 @@ function renderAccreditationChart() {
   if (!canvas) return;
 
   var lous = App.data.lous.slice();
-
-  // Sort LOUs by accreditation date
   lous.sort(function(a, b) {
     var da = (a.attributes && a.attributes.accreditationDate) || '';
     var db = (b.attributes && b.attributes.accreditationDate) || '';
@@ -171,7 +161,7 @@ function renderAccreditationChart() {
     if (!date) return;
     var year = date.substring(0, 4);
     cumulative++;
-    labels.push(year + ' · ' + shortName(App.helpers ? App.helpers.louName(lou) : lou.id));
+    labels.push(year + ' \u00b7 ' + shortName(App.helpers ? App.helpers.louName(lou) : lou.id));
     counts.push(cumulative);
   });
 
@@ -201,14 +191,137 @@ function renderAccreditationChart() {
   });
 }
 
+// Chart 5: Market share over time (top 5 LOUs)
+function renderMarketShareHistoryChart() {
+  var trendsSection = document.getElementById('view-trends');
+  if (!trendsSection) return;
+
+  var wrapper = document.createElement('div');
+  wrapper.className = 'chart-row';
+  wrapper.innerHTML = '<div class="chart-card wide"><div class="chart-card-header"><span class="chart-title">Market Share Over Time \u2014 Top 5 LOUs</span></div><div class="chart-container"><canvas id="trends-share-chart"></canvas></div></div>';
+  trendsSection.appendChild(wrapper);
+
+  var canvas = document.getElementById('trends-share-chart');
+  var msHistory = App.data.marketShareHistory || [];
+
+  if (msHistory.length === 0) {
+    showNoPipelineMessage(canvas);
+    return;
+  }
+
+  // Find top 5 LOUs by latest share
+  var latest = msHistory[msHistory.length - 1];
+  var byLou = latest.byLou || {};
+  var top5 = Object.keys(byLou)
+    .sort(function(a, b) { return (byLou[b].share || 0) - (byLou[a].share || 0); })
+    .slice(0, 5);
+
+  var colors = ['#00d4ff', '#00e676', '#ffd600', '#ff9800', '#e040fb'];
+  var louNameFn = App.helpers ? App.helpers.louName : function(l) { return l.id; };
+
+  var datasets = top5.map(function(lei, i) {
+    var lou = App.data.louMap[lei];
+    return {
+      label: lou ? shortName(louNameFn(lou)) : lei,
+      data: msHistory.map(function(snapshot) {
+        var e = snapshot.byLou && snapshot.byLou[lei];
+        return e ? (e.share * 100) : 0;
+      }),
+      borderColor: colors[i],
+      backgroundColor: 'transparent',
+      borderWidth: 2,
+      tension: 0.3,
+      pointRadius: 2,
+    };
+  });
+
+  new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: msHistory.map(function(s) { return s.date || ''; }),
+      datasets: datasets,
+    },
+    options: App.chartDefaults({
+      scales: {
+        x: { ticks: { maxTicksLimit: 12 } },
+        y: { ticks: { callback: function(v) { return v.toFixed(1) + '%'; } } },
+      },
+    }),
+  });
+}
+
+// Chart 6: Status breakdown stacked bar (global, from history)
+function renderStatusBreakdownChart() {
+  var trendsSection = document.getElementById('view-trends');
+  if (!trendsSection) return;
+
+  var wrapper = document.createElement('div');
+  wrapper.className = 'chart-row';
+  wrapper.innerHTML = '<div class="chart-card wide"><div class="chart-card-header"><span class="chart-title">LEI Status Breakdown \u2014 Last 90 Days</span></div><div class="chart-container"><canvas id="trends-status-chart"></canvas></div></div>';
+  trendsSection.appendChild(wrapper);
+
+  var canvas = document.getElementById('trends-status-chart');
+  var history = App.data.history || [];
+  var last90 = history.slice(-90);
+
+  // Collect all status keys that appear
+  var statusKeys = {};
+  last90.forEach(function(d) {
+    if (d.statusBreakdown) {
+      Object.keys(d.statusBreakdown).forEach(function(k) { statusKeys[k] = true; });
+    }
+  });
+
+  var keys = Object.keys(statusKeys);
+  if (keys.length === 0 || last90.length === 0) {
+    showNoPipelineMessage(canvas);
+    return;
+  }
+
+  var statusColors = {
+    ISSUED: '#00e676',
+    LAPSED: '#ff1744',
+    PENDING_TRANSFER: '#ffd600',
+    PENDING_ARCHIVAL: '#ff9800',
+    ANNULLED: '#9e9e9e',
+    MERGED: '#7c4dff',
+    RETIRED: '#455a64',
+    DUPLICATE: '#f06292',
+    TRANSFERRED: '#40c4ff',
+  };
+
+  var datasets = keys.map(function(status) {
+    return {
+      label: status,
+      data: last90.map(function(d) { return (d.statusBreakdown && d.statusBreakdown[status]) || 0; }),
+      backgroundColor: statusColors[status] || '#888',
+      borderWidth: 0,
+    };
+  });
+
+  new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: last90.map(function(d) { return d.date || ''; }),
+      datasets: datasets,
+    },
+    options: App.chartDefaults({
+      scales: {
+        x: { stacked: true, ticks: { maxTicksLimit: 15, maxRotation: 0 } },
+        y: { stacked: true },
+      },
+    }),
+  });
+}
+
 function showNoPipelineMessage(canvas) {
   canvas.parentElement.innerHTML =
     '<p style="color:var(--text-secondary);font-size:13px;padding:40px 20px;text-align:center">' +
     'Trend data will appear after the GitHub Actions pipeline runs.<br>' +
-    '<span style="font-size:11px;opacity:0.6">Actions → Update LEI Statistics → Run workflow</span>' +
+    '<span style="font-size:11px;opacity:0.6">Actions \u2192 Update LEI Statistics \u2192 Run workflow</span>' +
     '</p>';
 }
 
 function shortName(name) {
-  return name.length > 32 ? name.substring(0, 30) + '…' : name;
+  return name.length > 32 ? name.substring(0, 30) + '\u2026' : name;
 }

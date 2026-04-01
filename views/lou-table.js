@@ -3,18 +3,21 @@
 window.App = window.App || {};
 App.views = App.views || {};
 
+var _louTable = null;
+
 App.views.initLouTable = function() {
   var el = document.getElementById('lou-table');
   if (!el) return;
 
   var louName = App.helpers ? App.helpers.louName : function(l) { return l.id; };
-  var escHtml = App.helpers ? App.helpers.escHtml : function(s) { return s; };
+  var escHtml = App.helpers ? App.helpers.escHtml : function(s) { return String(s); };
 
   var tableData = App.data.lous.map(function(lou) {
     var attrs = lou.attributes || {};
     var raCount = (App.data.rasByLou[lou.id] || []).length;
     var jurisdictions = (App.data.jurisdictions[lou.id] || []);
     var delta = (App.data.stats && App.data.stats.byLou && App.data.stats.byLou[lou.id]) || 0;
+    var ms = App.data.marketShare && App.data.marketShare.byLou && App.data.marketShare.byLou[lou.id];
 
     return {
       id: lou.id,
@@ -25,15 +28,24 @@ App.views.initLouTable = function() {
       raCount: raCount,
       todayLEIs: delta,
       website: attrs.website || '',
+      marketShare: ms ? ms.share : null,
+      lapseRate: ms && ms.total > 0 ? ms.lapsed / ms.total : null,
       _jurisdictions: jurisdictions,
       _ras: App.data.rasByLou[lou.id] || [],
     };
   });
 
-  // Sort by RA count desc by default
   tableData.sort(function(a, b) { return b.raCount - a.raCount; });
 
-  new Tabulator('#lou-table', {
+  // Wire export button
+  var exportBtn = document.getElementById('lou-export-btn');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', function() {
+      if (_louTable) _louTable.download('csv', 'lou-directory.csv');
+    });
+  }
+
+  _louTable = new Tabulator('#lou-table', {
     data: tableData,
     layout: 'fitColumns',
     responsiveLayout: 'hide',
@@ -48,14 +60,16 @@ App.views.initLouTable = function() {
     },
 
     rowClick: function(e, row) {
-      row.toggleDetail && row.toggleDetail();
+      // If click on compare checkbox, don't open profile
+      if (e.target && e.target.classList.contains('compare-checkbox')) return;
+      var d = row.getData();
+      if (App.views.showLouProfile) App.views.showLouProfile(d.id);
     },
 
     rowDetail: function(row) {
       var d = row.getData();
       var el = document.createElement('div');
       el.style.cssText = 'padding:14px 20px;background:#080c17;';
-
       var sections = [];
 
       if (d._ras.length > 0) {
@@ -83,6 +97,23 @@ App.views.initLouTable = function() {
 
     columns: [
       {
+        title: '',
+        field: 'id',
+        width: 36,
+        hozAlign: 'center',
+        headerSort: false,
+        formatter: function(cell) {
+          var lei = cell.getValue();
+          var checked = App.views.selectedForComparison && App.views.selectedForComparison.indexOf(lei) !== -1;
+          return '<input type="checkbox" class="compare-checkbox" data-lei="' + escHtml(lei) + '"' + (checked ? ' checked' : '') + '>';
+        },
+        cellClick: function(e, cell) {
+          var lei = cell.getValue();
+          var added = App.views.toggleCompare(lei);
+          cell.getElement().querySelector('input').checked = (added !== false && App.views.selectedForComparison.indexOf(lei) !== -1);
+        },
+      },
+      {
         title: 'Name',
         field: 'name',
         sorter: 'string',
@@ -90,7 +121,7 @@ App.views.initLouTable = function() {
         headerFilterPlaceholder: 'Search...',
         widthGrow: 3,
         formatter: function(cell) {
-          return '<strong style="color:var(--text-primary)">' + escHtml(cell.getValue()) + '</strong>';
+          return '<strong style="color:var(--accent-blue);cursor:pointer">' + escHtml(cell.getValue()) + '</strong>';
         },
       },
       {
@@ -110,7 +141,32 @@ App.views.initLouTable = function() {
         widthGrow: 1,
         responsive: 3,
         formatter: function(cell) {
-          return '<span style="color:var(--text-secondary)">' + (cell.getValue() || '—') + '</span>';
+          return '<span style="color:var(--text-secondary)">' + (cell.getValue() || '\u2014') + '</span>';
+        },
+      },
+      {
+        title: 'Market Share',
+        field: 'marketShare',
+        sorter: 'number',
+        hozAlign: 'right',
+        widthGrow: 1,
+        formatter: function(cell) {
+          var v = cell.getValue();
+          if (v == null) return '<span style="color:var(--text-secondary)">\u2014</span>';
+          return '<span class="cell-number">' + (v * 100).toFixed(2) + '%</span>';
+        },
+      },
+      {
+        title: 'Lapse Rate',
+        field: 'lapseRate',
+        sorter: 'number',
+        hozAlign: 'right',
+        widthGrow: 0.9,
+        formatter: function(cell) {
+          var v = cell.getValue();
+          if (v == null) return '<span style="color:var(--text-secondary)">\u2014</span>';
+          var color = v > 0.25 ? 'var(--accent-red)' : v > 0.15 ? '#ff9800' : 'var(--accent-green)';
+          return '<span style="color:' + color + ';font-weight:600">' + (v * 100).toFixed(1) + '%</span>';
         },
       },
       {
@@ -141,7 +197,7 @@ App.views.initLouTable = function() {
         widthGrow: 0.9,
         formatter: function(cell) {
           var v = cell.getValue();
-          if (!v) return '<span style="color:var(--text-secondary)">—</span>';
+          if (!v) return '<span style="color:var(--text-secondary)">\u2014</span>';
           return '<span style="color:var(--accent-green);font-weight:600">+' + v.toLocaleString() + '</span>';
         },
       },
@@ -152,8 +208,8 @@ App.views.initLouTable = function() {
         responsive: 4,
         formatter: function(cell) {
           var v = cell.getValue();
-          if (!v) return '<span style="color:var(--text-secondary)">—</span>';
-          return '<a class="cell-link" href="' + escHtml(v) + '" target="_blank" rel="noopener">↗ ' + escHtml(v.replace(/^https?:\/\//, '').replace(/\/$/, '')) + '</a>';
+          if (!v) return '<span style="color:var(--text-secondary)">\u2014</span>';
+          return '<a class="cell-link" href="' + escHtml(v) + '" target="_blank" rel="noopener">\u2197 ' + escHtml(v.replace(/^https?:\/\//, '').replace(/\/$/, '')) + '</a>';
         },
       },
     ],

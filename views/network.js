@@ -9,20 +9,17 @@ App.views.initNetwork = function() {
 
   var d = App.data;
   var louName = App.helpers ? App.helpers.louName : function(l) { return l.id; };
-  var escHtml = App.helpers ? App.helpers.escHtml : function(s) { return s; };
+  var escHtml = App.helpers ? App.helpers.escHtml : function(s) { return String(s); };
 
-  // ---- Build nodes ----
   var nodes = new vis.DataSet();
   var edges = new vis.DataSet();
 
-  // Max RA count for size scaling
   var maxRaCount = 1;
   d.lous.forEach(function(lou) {
     var c = (d.rasByLou[lou.id] || []).length;
     if (c > maxRaCount) maxRaCount = c;
   });
 
-  // Max today's delta for size modulation (if available)
   var maxDelta = 1;
   if (d.stats && d.stats.byLou) {
     Object.values(d.stats.byLou).forEach(function(v) {
@@ -30,20 +27,28 @@ App.views.initNetwork = function() {
     });
   }
 
+  // Compute per-LOU 30d activity for RA activity weighting
+  var louActivity = {}; // lei -> 30d total
+  var maxLouActivity = 1;
+  (d.history || []).slice(-30).forEach(function(day) {
+    if (!day.byLou) return;
+    Object.keys(day.byLou).forEach(function(lei) {
+      louActivity[lei] = (louActivity[lei] || 0) + day.byLou[lei];
+    });
+  });
+  Object.values(louActivity).forEach(function(v) { if (v > maxLouActivity) maxLouActivity = v; });
+
   // Add LOU nodes
   d.lous.forEach(function(lou) {
     var name = louName(lou);
     var raCount = (d.rasByLou[lou.id] || []).length;
     var delta = (d.stats && d.stats.byLou && d.stats.byLou[lou.id]) || 0;
-    var countryCount = (d.jurisdictions[lou.id] || []).length;
-
-    // Size: base 28, scaled by RA count, boosted by today's delta
     var size = 28 + (raCount / maxRaCount) * 22;
     if (delta > 0) size += (delta / maxDelta) * 12;
 
     nodes.add({
       id: lou.id,
-      label: name.length > 28 ? name.substring(0, 26) + '…' : name,
+      label: name.length > 28 ? name.substring(0, 26) + '\u2026' : name,
       shape: 'dot',
       size: size,
       color: {
@@ -59,18 +64,29 @@ App.views.initNetwork = function() {
     });
   });
 
-  // Add RA nodes and edges
+  // Add RA nodes with activity-weighted size/color
   d.ras.forEach(function(ra, i) {
     var name = (ra.attributes && ra.attributes.name) || 'RA ' + i;
     var louLei = ra._louLei;
+    var raCountForParent = louLei ? (d.rasByLou[louLei] || []).length : 1;
+    var parentActivity = louLei ? (louActivity[louLei] || 0) : 0;
+    // Activity proxy: parent LOU 30d activity shared equally among its RAs
+    var raActivity = raCountForParent > 0 ? parentActivity / raCountForParent : 0;
+    var activityRatio = maxLouActivity > 0 ? raActivity / maxLouActivity : 0;
+    // Size: 8-16 based on activity
+    var raSize = 8 + activityRatio * 8;
+    // Color: darker grey when inactive, lighter when active
+    var greyVal = Math.round(42 + activityRatio * 80); // 42 to 122
+    var greyHex = greyVal.toString(16).padStart(2, '0');
+    var raBg = '#' + greyHex + greyHex + (Math.min(255, greyVal + 40)).toString(16).padStart(2, '0');
 
     nodes.add({
       id: 'ra_' + (ra.id || i),
-      label: name.length > 24 ? name.substring(0, 22) + '…' : name,
+      label: name.length > 24 ? name.substring(0, 22) + '\u2026' : name,
       shape: 'square',
-      size: 10,
+      size: raSize,
       color: {
-        background: '#2a3a50',
+        background: raBg,
         border: '#3a5070',
         highlight: { background: '#8892a4', border: '#aab2c0' },
         hover: { background: '#3a5070', border: '#8892a4' },
@@ -93,7 +109,6 @@ App.views.initNetwork = function() {
     }
   });
 
-  // ---- vis.js Network options ----
   var options = {
     physics: {
       enabled: true,
@@ -106,37 +121,22 @@ App.views.initNetwork = function() {
         damping: 0.4,
         avoidOverlap: 0.5,
       },
-      stabilization: {
-        enabled: true,
-        iterations: 300,
-        updateInterval: 25,
-        fit: true,
-      },
+      stabilization: { enabled: true, iterations: 300, updateInterval: 25, fit: true },
     },
-    interaction: {
-      hover: true,
-      tooltipDelay: 200,
-      zoomView: true,
-      dragView: true,
-    },
+    interaction: { hover: true, tooltipDelay: 200, zoomView: true, dragView: true },
     nodes: { borderWidth: 1.5 },
     edges: { arrows: { to: { enabled: false } } },
   };
 
   var network = new vis.Network(container, { nodes: nodes, edges: edges }, options);
 
-  // Freeze physics after stabilization for smooth interaction
   network.on('stabilized', function() {
     network.setOptions({ physics: false });
   });
 
-  // ---- Click handler: show sidebar ----
   network.on('click', function(params) {
     if (params.nodes.length === 0) {
-      // Clicked empty space — reset highlights, hide sidebar
-      nodes.forEach(function(n) {
-        nodes.update({ id: n.id, opacity: 1 });
-      });
+      nodes.forEach(function(n) { nodes.update({ id: n.id, opacity: 1 }); });
       hideSidebar();
       return;
     }
@@ -145,7 +145,6 @@ App.views.initNetwork = function() {
     var node = nodes.get(nodeId);
     if (!node) return;
 
-    // Dim nodes not connected to this one
     var connectedNodeIds = network.getConnectedNodes(nodeId);
     connectedNodeIds.push(nodeId);
     var connectedSet = {};
@@ -164,10 +163,10 @@ App.views.initNetwork = function() {
 
 function showLouSidebar(lou, escHtml, louName) {
   var name = louName(lou);
-  var lei = lou.id || '—';
+  var lei = lou.id || '\u2014';
   var attrs = lou.attributes || {};
   var website = attrs.website || null;
-  var accDate = attrs.accreditationDate ? attrs.accreditationDate.substring(0, 10) : '—';
+  var accDate = attrs.accreditationDate ? attrs.accreditationDate.substring(0, 10) : '\u2014';
   var ras = (App.data.rasByLou[lei] || []);
   var jurisdictions = (App.data.jurisdictions[lei] || []);
   var delta = (App.data.stats && App.data.stats.byLou && App.data.stats.byLou[lei]) || null;
@@ -182,8 +181,11 @@ function showLouSidebar(lou, escHtml, louName) {
     sidebarStat('Countries', jurisdictions.length) +
     sidebarStat('Registration Agents', ras.length) +
     (delta !== null ? sidebarStat("Today's New LEIs", delta.toLocaleString()) : '') +
-    (website ? '<div class="sidebar-stat"><span>Website</span><span><a class="cell-link" href="' + escHtml(website) + '" target="_blank" rel="noopener">↗ Visit</a></span></div>' : '') +
+    (website ? '<div class="sidebar-stat"><span>Website</span><span><a class="cell-link" href="' + escHtml(website) + '" target="_blank" rel="noopener">\u2197 Visit</a></span></div>' : '') +
     '</div>';
+
+  // View Full Profile button
+  html += '<div style="margin-top:16px"><button class="toolbar-btn toolbar-btn-accent" style="width:100%" onclick="App.views.showLouProfile && App.views.showLouProfile(\'' + escHtml(lei) + '\')">View Full Profile</button></div>';
 
   if (ras.length > 0) {
     html += '<div class="sidebar-section"><div class="sidebar-section-title">Registration Agents (' + ras.length + ')</div>';
@@ -196,10 +198,10 @@ function showLouSidebar(lou, escHtml, louName) {
   if (jurisdictions.length > 0) {
     html += '<div class="sidebar-section"><div class="sidebar-section-title">Jurisdictions (' + jurisdictions.length + ')</div>';
     jurisdictions.slice(0, 20).forEach(function(j) {
-      var cc = (j.attributes && j.attributes.countryCode) || '—';
+      var cc = (j.attributes && j.attributes.countryCode) || '\u2014';
       html += '<div class="sidebar-list-item">' + escHtml(cc) + '</div>';
     });
-    if (jurisdictions.length > 20) html += '<div class="sidebar-list-item" style="color:var(--text-secondary)">…and ' + (jurisdictions.length - 20) + ' more</div>';
+    if (jurisdictions.length > 20) html += '<div class="sidebar-list-item" style="color:var(--text-secondary)">\u2026and ' + (jurisdictions.length - 20) + ' more</div>';
     html += '</div>';
   }
 
@@ -209,10 +211,10 @@ function showLouSidebar(lou, escHtml, louName) {
 function showRaSidebar(ra, escHtml) {
   var attrs = ra.attributes || {};
   var name = attrs.name || ra.id;
-  var lei = ra.id || '—';
+  var lei = ra.id || '\u2014';
   var louLei = ra._louLei;
   var parentLou = louLei && App.data.louMap[louLei];
-  var parentName = parentLou ? (App.helpers ? App.helpers.louName(parentLou) : louLei) : '—';
+  var parentName = parentLou ? (App.helpers ? App.helpers.louName(parentLou) : louLei) : '\u2014';
   var websites = attrs.websites || (attrs.website ? [attrs.website] : []);
 
   var html = '<span class="sidebar-type-badge ra">Registration Agent</span>' +
@@ -222,8 +224,12 @@ function showRaSidebar(ra, escHtml) {
   html += '<div class="sidebar-section">' +
     '<div class="sidebar-section-title">Details</div>' +
     sidebarStat('Parent LOU', parentName) +
-    (websites.length > 0 ? '<div class="sidebar-stat"><span>Website</span><span><a class="cell-link" href="' + escHtml(websites[0]) + '" target="_blank" rel="noopener">↗ Visit</a></span></div>' : '') +
+    (websites.length > 0 ? '<div class="sidebar-stat"><span>Website</span><span><a class="cell-link" href="' + escHtml(websites[0]) + '" target="_blank" rel="noopener">\u2197 Visit</a></span></div>' : '') +
     '</div>';
+
+  if (louLei) {
+    html += '<div style="margin-top:12px"><button class="toolbar-btn" style="width:100%" onclick="App.views.showLouProfile && App.views.showLouProfile(\'' + escHtml(louLei) + '\')">View Parent LOU Profile</button></div>';
+  }
 
   renderSidebar(html);
 }
@@ -245,7 +251,6 @@ function hideSidebar() {
   if (sidebar) sidebar.classList.add('hidden');
 }
 
-// Close button
 document.addEventListener('DOMContentLoaded', function() {
   var btn = document.getElementById('network-sidebar-close');
   if (btn) btn.addEventListener('click', hideSidebar);
