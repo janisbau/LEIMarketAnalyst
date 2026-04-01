@@ -19,9 +19,11 @@ jobs:
 
       - name: Download GLEIF LastDay delta
         run: |
-          echo "Downloading GLEIF Golden Copy LastDay delta..."
-          curl -L --retry 3 --retry-delay 5 -o delta.zip \
-            "https://goldencopy-next.gleif.org/api/v2/golden-copies/publishes/lei2/latest.csv?delta=LastDay"
+          echo "Fetching latest Golden Copy metadata..."
+          DELTA_URL=$(curl -s "https://goldencopy.gleif.org/api/v2/golden-copies/publishes" \
+            | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['data'][0]['lei2']['delta_files']['LastDay']['csv']['url'])")
+          echo "Delta URL: $DELTA_URL"
+          curl -L --retry 3 --retry-delay 5 -o delta.zip "$DELTA_URL"
           echo "Download complete. File size: $(du -sh delta.zip | cut -f1)"
 
       - name: Unzip delta
