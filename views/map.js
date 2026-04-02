@@ -93,19 +93,33 @@ function styleFeature(feature) {
   if (_mapMode === 'opportunity') {
     var score = cc && _opportunityScores ? (_opportunityScores[cc] || 0) : 0;
     var fillColor = score >= 60 ? '#00e676'
-      : score >= 40 ? '#ffd600'
-      : score >= 20 ? '#ff9800'
-      : '#1e2a3a';
-    return { fillColor: fillColor, fillOpacity: score > 0 ? 0.75 : 0.3, color: '#1e2a3a', weight: 0.8 };
+      : score >= 40 ? '#fbbf24'
+      : score >= 20 ? '#f97316'
+      : '#1e293b';
+    var fillOpacity = score >= 60 ? 0.90
+      : score >= 40 ? 0.85
+      : score >= 20 ? 0.80
+      : 0.40;
+    return { fillColor: fillColor, fillOpacity: fillOpacity, color: '#475569', weight: 0.7 };
   }
 
-  // Coverage mode (default)
-  var louCount = cc ? (App.data.countryCoverage[cc] || []).length : 0;
-  var fillColor = louCount === 0 ? '#111827'
-    : louCount === 1 ? '#0d47a1'
-    : louCount === 2 ? '#1976d2'
-    : '#00d4ff';
-  return { fillColor: fillColor, fillOpacity: louCount === 0 ? 0.5 : 0.75, color: '#1e2a3a', weight: 0.8 };
+  // Coverage mode — colour by actual daily LEI issuance volume
+  // (jurisdiction accreditation is global for most LOUs, so volume is more meaningful)
+  var byCountry = (App.data.stats && App.data.stats.byCountry) || {};
+  var vol = cc ? (byCountry[cc] || 0) : 0;
+  var fillColor = vol === 0    ? '#1e293b'   // no activity today
+    : vol < 50               ? '#1e40af'    // minimal  (<50)
+    : vol < 300              ? '#2563eb'    // moderate (50–299)
+    : vol < 1000             ? '#0ea5e9'    // active   (300–999)
+    : '#00d4ff';                            // high     (1000+)
+  var fillOpacity = vol === 0 ? 0.50
+    : vol < 50               ? 0.75
+    : vol < 300              ? 0.82
+    : vol < 1000             ? 0.88
+    : 0.94;
+  var borderColor = vol === 0 ? '#334155' : '#60a5fa';
+  var borderWeight = vol === 0 ? 0.7 : 1.1;
+  return { fillColor: fillColor, fillOpacity: fillOpacity, color: borderColor, weight: borderWeight };
 }
 
 function onEachFeature(feature, layer) {
@@ -115,7 +129,7 @@ function onEachFeature(feature, layer) {
 
   layer.on({
     mouseover: function(e) {
-      e.target.setStyle({ weight: 2, color: '#00d4ff', fillOpacity: 0.9 });
+      e.target.setStyle({ weight: 2.5, color: '#ffffff', fillOpacity: 0.95 });
       e.target.bringToFront();
     },
     mouseout: function(e) {
@@ -154,11 +168,11 @@ function onEachFeature(feature, layer) {
 
 function getCountryCode(feature) {
   if (!feature || !feature.properties) return null;
-  return feature.properties.ISO_A2 ||
+  return feature.properties['ISO3166-1-Alpha-2'] ||
+         feature.properties.ISO_A2 ||
          feature.properties.iso_a2 ||
          feature.properties.ISO2 ||
          feature.properties.iso2 ||
-         feature.properties.ADM0_A3 ||
          null;
 }
 

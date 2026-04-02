@@ -77,11 +77,12 @@
       </div>
       <div class="map-toolbar">
         <div class="map-legend" id="map-legend">
-          <span class="legend-label">LOUs active:</span>
-          <span class="legend-item" style="background:#1e2a3a">0</span>
-          <span class="legend-item" style="background:#0d47a1">1</span>
-          <span class="legend-item" style="background:#1976d2">2</span>
-          <span class="legend-item" style="background:#00d4ff;color:#0a0e1a">3+</span>
+          <span class="legend-label">Daily LEIs:</span>
+          <span class="legend-item" style="background:#1e293b;color:#94a3b8;border:1px solid #334155">0</span>
+          <span class="legend-item" style="background:#1e40af">&lt;50</span>
+          <span class="legend-item" style="background:#2563eb">50–299</span>
+          <span class="legend-item" style="background:#0ea5e9">300–999</span>
+          <span class="legend-item" style="background:#00d4ff;color:#0a0e1a">1000+</span>
         </div>
         <div class="map-mode-toggle">
           <button class="map-mode-btn active" data-mode="coverage">Coverage</button>
@@ -220,16 +221,16 @@
   <script src="https://unpkg.com/tabulator-tables@6.2.1/dist/js/tabulator.min.js"></script>
   <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 
-  <script src="api.js"></script>
-  <script src="views/intelligence.js"></script>
-  <script src="views/dashboard.js"></script>
-  <script src="views/map.js"></script>
-  <script src="views/network.js"></script>
-  <script src="views/lou-table.js"></script>
-  <script src="views/ra-table.js"></script>
-  <script src="views/trends.js"></script>
-  <script src="views/lou-profile.js"></script>
-  <script src="views/comparison.js"></script>
-  <script src="app.js"></script>
+  <script src="api.js?v=2"></script>
+  <script src="views/intelligence.js?v=2"></script>
+  <script src="views/dashboard.js?v=2"></script>
+  <script src="views/map.js?v=3"></script>
+  <script src="views/network.js?v=2"></script>
+  <script src="views/lou-table.js?v=2"></script>
+  <script src="views/ra-table.js?v=2"></script>
+  <script src="views/trends.js?v=2"></script>
+  <script src="views/lou-profile.js?v=2"></script>
+  <script src="views/comparison.js?v=2"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>
