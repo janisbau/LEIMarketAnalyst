@@ -1,22 +1,25 @@
 # CLAUDE.md — LEI Market Analyzer
 
-This file documents all decisions, architecture choices, and context for this project.
+This file documents all decisions, architecture choices, and context for this project so any future Claude session (or collaborator) can pick up exactly where we left off.
 
 ---
 
 ## Project Overview
 
-**LEI Market Analyzer** is a static single-page web app that visualizes the global Legal Entity Identifier (LEI) market. It tracks:
+**LEI Market Analyzer** is a static single-page web app for aspiring LOUs (Legal Entity Identifier issuers) who want a comprehensive view of the global LEI market — competitive landscape, geographic opportunity, RA relationships, and trend data.
 
-- **LOUs** (Local Operating Units) — the ~40 accredited organizations that issue LEI codes worldwide
-- **Registration Agents (RAs)** — ~60+ intermediaries that distribute LEI services on behalf of LOUs
-- **Geographic coverage** — which countries each LOU is accredited to operate in
-- **Market trends** — daily LEI issuance volume, growth rates, top performers
-- **Relationships** — animated force-directed network showing RA ↔ LOU connections
+It tracks:
+- **LOUs** — the ~40 accredited organizations that issue LEI codes worldwide
+- **Registration Agents (RAs)** — ~67 intermediaries that distribute LEI services on behalf of LOUs
+- **Geographic coverage** — which countries each LOU is accredited to operate in; actual daily issuance volume per country
+- **Market share** — cumulative active/lapsed LEIs per LOU from full Golden Copy
+- **Market trends** — daily LEI issuance volume, growth rates, status breakdown, transfers
+- **Relationships** — force-directed network showing RA ↔ LOU connections, weighted by activity
+- **Market intelligence** — opportunity scores per country, whitespace detection, RA coverage gaps, regulatory context
 
-Data comes from the Global LEI Foundation (GLEIF), which manages the global LEI system. All data is free and publicly accessible.
+Data comes from the Global LEI Foundation (GLEIF). All data is free and publicly accessible; no API key required.
 
-**Repository:** (to be linked after pushing to GitHub)
+**Repository:** https://github.com/janisbau/LEIMarketAnalyst
 
 ---
 
@@ -26,16 +29,16 @@ Data comes from the Global LEI Foundation (GLEIF), which manages the global LEI 
 |---|---|---|---|
 | Chart.js | 4.4.0 | jsdelivr CDN | Line, bar, doughnut trend charts |
 | Leaflet.js | 1.9.4 | unpkg CDN | World choropleth map |
-| vis.js Network | latest | unpkg CDN | RA-LOU animated force-directed network graph |
+| vis.js Network | latest | unpkg CDN | RA-LOU force-directed network graph |
 | Tabulator.js | 6.2.1 | unpkg CDN | Sortable, filterable, paginated tables |
 | GLEIF REST API | v1 | api.gleif.org | Live LOU/RA structure data (free, no auth) |
-| GLEIF Golden Copy | — | goldencopy-next.gleif.org | Bulk LEI delta files for trend statistics |
+| GLEIF Golden Copy API | v2 | goldencopy.gleif.org | Bulk LEI CSV files for trend statistics |
 | GeoJSON World | — | github.com/datasets/geo-countries | Country polygons for Leaflet choropleth |
 | Google Fonts | — | CDN | Inter (body) + Space Grotesk (headings) |
-| GitHub Actions | free tier | github.com | Daily pipeline: delta → aggregated JSON |
+| GitHub Actions | free tier | github.com | Daily delta pipeline + monthly full pipeline |
 | GitHub Pages | free | github.com | Static site hosting |
 
-**No build tools. No npm. No Node.js required.** Open `index.html` in a browser (via http.server).
+**No build tools. No npm. No Node.js required.** All JS is plain ES5/ES6, no modules, opened via http.server.
 
 ---
 
@@ -43,99 +46,162 @@ Data comes from the Global LEI Foundation (GLEIF), which manages the global LEI 
 
 ```
 LEIMarket/
-├── index.html              — App shell: nav + 6 section containers + loading overlay
-├── style.css               — NASDAQ-style theme; all CSS variables and view styles
-├── api.js                  — GLEIF REST API fetch calls, sessionStorage caching, data normalization
-├── app.js                  — Entry point: boot sequence, tab switching, window.App namespace
+├── index.html                  — App shell: nav, 7 view sections, overlays, loading screen
+├── style.css                   — NASDAQ dark theme, CSS variables, all view styles (v=5)
+├── api.js                      — GLEIF REST API fetches, sessionStorage caching, loadLocalStats()
+├── app.js                      — Boot sequence, tab routing, global search, window.App namespace
 ├── views/
-│   ├── dashboard.js        — KPI metric cards + 30-day LEI sparkline
-│   ├── map.js              — World choropleth map (Leaflet + GeoJSON)
-│   ├── network.js          — RA-LOU force-directed network graph (vis.js)
-│   ├── lou-table.js        — LOU directory (Tabulator, sortable/filterable)
-│   ├── ra-table.js         — RA directory (Tabulator)
-│   └── trends.js           — 4 trend charts (Chart.js)
+│   ├── dashboard.js            — KPI cards, market health, intelligence bullets, market share chart
+│   ├── map.js                  — World choropleth (Leaflet); Coverage mode (daily volume) + Opportunity mode
+│   ├── network.js              — RA-LOU force graph (vis.js); activity-weighted nodes; sidebar detail
+│   ├── lou-table.js            — LOU directory (Tabulator); market share %, lapse rate, compare, CSV export
+│   ├── ra-table.js             — RA directory (Tabulator); loyalty badges, multi-LOU filter, CSV export
+│   ├── trends.js               — 6 Chart.js charts (daily volume, top LOUs, country growth, status, market share, transfers)
+│   ├── intelligence.js         — Intelligence tab: insights, opportunity scores, whitespace, RA gaps, regulatory context
+│   ├── lou-profile.js          — Full-screen LOU profile overlay: 4 tabs (Overview/RA Network/Geography/Trends)
+│   └── comparison.js           — Side-by-side LOU comparison modal (up to 4 LOUs)
 ├── data/
-│   ├── daily-stats.json    — AUTO-GENERATED by GitHub Actions; today's LEI delta snapshot
-│   └── history.json        — AUTO-GENERATED; cumulative daily time-series (append-only)
+│   ├── daily-stats.json        — AUTO-GENERATED daily; today's delta snapshot (byLou, byCountry, transfers)
+│   ├── history.json            — AUTO-GENERATED; cumulative daily time-series, last 730 days
+│   ├── market-share.json       — AUTO-GENERATED monthly; active/lapsed/share% per LOU
+│   ├── market-share-history.json — AUTO-GENERATED monthly; monthly snapshots (last 36 months)
+│   ├── entity-types.json       — AUTO-GENERATED monthly; entity type breakdown per LOU
+│   ├── renewal-pipeline.json   — AUTO-GENERATED monthly; LEI expiries by LOU/month (next 12 months)
+│   ├── lou-home-countries.json — AUTO-GENERATED monthly; primary country per LOU (most LEIs issued)
+│   └── regulatory-context.json — STATIC; 25 jurisdictions with regulations and adoption levels
 ├── scripts/
-│   └── process_delta.py    — Python script run by GitHub Actions to process GLEIF delta CSV
+│   ├── process_delta.py        — Processes daily GLEIF delta CSV → daily-stats.json + history.json
+│   ├── process_full.py         — Processes full Golden Copy CSV → 5 market-share files (streaming)
+│   └── fetch_local.py          — LOCAL BOOTSTRAP: downloads + processes Golden Copy without GitHub Actions
 ├── .github/
 │   └── workflows/
-│       └── update-stats.yml — Daily cron job: download delta → aggregate → commit JSON
-└── CLAUDE.md               — This file
+│       ├── update-stats.yml    — Daily cron (08:00 UTC): delta download → process → commit
+│       └── update-full.yml     — Monthly cron (1st, 07:00 UTC): full download → process → commit
+└── CLAUDE.md                   — This file
 ```
 
 ---
 
 ## How to Run
 
-### Local development (recommended)
-```
+### Option 1 — Local (recommended for development)
+```bash
 cd C:\Users\jbauv\LEIMarket
-python -m http.server 3000
+python -m http.server 3001
 ```
-Open `http://localhost:3000` in your browser. **Do not open `index.html` directly** — `fetch()` calls to `data/*.json` will fail on `file://` protocol.
+Open `http://localhost:3001`. **Do not open `index.html` directly** — `fetch()` calls fail on `file://`.
 
-### GitHub Pages (production hosting)
-1. Push to GitHub: `git push`
-2. Settings → Pages → Source: Branch `master`, folder `/root`
-3. Site will be live at `https://[your-username].github.io/[repo-name]`
+### Option 2 — GitHub Pages (production)
+1. Create a repo on GitHub
+2. `git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git`
+3. `git push -u origin master`
+4. Settings → Pages → Source: Branch `master`, folder `/root`
+5. Site live at `https://YOUR_USERNAME.github.io/YOUR_REPO`
+
+---
+
+## Getting Data (Critical First Step)
+
+The app shows live GLEIF structural data (LOUs, RAs, jurisdictions) automatically on load. But trend/statistics charts need to be populated separately.
+
+### Local bootstrap (run once)
+```bash
+cd C:\Users\jbauv\LEIMarket
+python scripts/fetch_local.py          # delta only (~1.6 MB, fast, populates history)
+python scripts/fetch_local.py --full   # also full Golden Copy (~450 MB, populates market share)
+```
+`fetch_local.py` uses the GLEIF publishes API to get the current download URL automatically (no hardcoded URLs to go stale).
+
+### Automated (GitHub Actions)
+- **Daily** (08:00 UTC): `update-stats.yml` downloads LastDay delta, runs `process_delta.py`, commits `daily-stats.json` + `history.json`
+- **Monthly** (1st of month, 07:00 UTC): `update-full.yml` downloads full Golden Copy, runs `process_full.py`, commits 5 market-share files
+- Trigger manually: GitHub → Actions → workflow → "Run workflow"
+- **The repo stays lightweight** — raw Golden Copy is processed and discarded, only small JSON files (~100KB total) are committed
+
+### GLEIF Golden Copy API
+```
+GET https://goldencopy.gleif.org/api/v2/golden-copies/publishes
+```
+Returns JSON with current download URLs for full and delta files. **Use this API to get the URL** — do not hardcode storage URLs as they change with each publish date.
 
 ---
 
 ## Data Architecture
 
-### Two data sources
+### Two live data sources
 
-**Source A — GLEIF REST API (live, structural)**
-- Fetched on page load via browser `fetch()`
-- Cached in `sessionStorage` for the browser session
-- Data: all 40 LOUs, ~60 RAs, jurisdiction lists per LOU
+**Source A — GLEIF REST API (live, on page load)**
+- Fetched in parallel at boot, cached in `sessionStorage` for the browser session
+- Provides: all LOUs, all RAs, per-LOU jurisdiction lists
 
-**Source B — GLEIF Golden Copy delta (pre-processed, historical)**
-- Raw delta files are large ZIP-compressed CSVs (~50-200MB) — NOT loaded by the browser
-- A GitHub Actions workflow processes them daily and commits aggregated JSON to `data/`
-- Frontend reads `data/daily-stats.json` and `data/history.json` as lightweight static files
+**Source B — Processed Golden Copy (pre-aggregated JSON, static files)**
+- Raw files too large for browser; pre-processed by Python scripts
+- Frontend reads small JSON files via `fetch('data/*.json', { cache: 'no-store' })`
+- `cache: 'no-store'` ensures browser always reads fresh files after pipeline runs
 
 ### `window.App` namespace
 
-All JavaScript shares a single `window.App` global to avoid polluting the global scope:
-
 ```javascript
-App.api    — GLEIF fetch functions
-App.data   — normalized data loaded on boot
-App.views  — each view's init() function
-App.helpers — shared utilities (louName, escHtml)
-App.chartDefaults — shared Chart.js configuration factory
+App.api      — GLEIF fetch functions
+App.data     — all loaded data (see shape below)
+App.views    — each view's init() function + generateInsights()
+App.helpers  — louName(lou), escHtml(s)
+App.chartDefaults — shared Chart.js config factory
 ```
 
-### `App.data` shape
+### `App.data` full shape
 
 ```javascript
 App.data = {
-  lous: [],             // 40 LOU objects from GLEIF REST API
-  ras: [],              // ~60 RA objects from GLEIF REST API
-  louMap: {},           // { louLei: louObject } — O(1) lookup
-  rasByLou: {},         // { louLei: [ra, ra, ...] }
-  jurisdictions: {},    // { louLei: [jurisdiction, ...] }
-  countryCoverage: {},  // { 'US': ['lei1', 'lei2'], 'DE': ['lei3'] }
-  stats: null,          // parsed data/daily-stats.json
-  history: [],          // parsed data/history.json array
+  // From GLEIF REST API (live)
+  lous: [],              // 40 LOU objects
+  ras: [],               // ~67 RA objects (each has ._louLei injected)
+  louMap: {},            // { louLei → louObject }
+  rasByLou: {},          // { louLei → [ra, ra, ...] }
+  jurisdictions: {},     // { louLei → [jurisdiction, ...] }
+  countryCoverage: {},   // { 'US' → ['lei1', 'lei2'], ... }  (all LOUs per country)
+
+  // From data/daily-stats.json (daily pipeline)
+  stats: {
+    date, totalDelta, byLou, byCountry, byLouByCountry,
+    byLouStatus, transfers: { outflows, inflows }, statusBreakdown
+  },
+
+  // From data/history.json (daily pipeline, last 730 days)
+  history: [ { date, newLEIs, byLou, byCountry, transfers, statusBreakdown }, ... ],
+
+  // From data/market-share.json (monthly pipeline)
+  marketShare: { date, totalActive, byLou: { lei → { active, lapsed, total, sharePercent } } },
+
+  // From data/market-share-history.json (monthly pipeline)
+  marketShareHistory: [ { date, byLou: { lei → sharePercent } }, ... ],
+
+  // From data/renewal-pipeline.json (monthly pipeline)
+  renewalPipeline: { byLou: { lei → { 'YYYY-MM' → count } } },
+
+  // From data/entity-types.json (monthly pipeline)
+  entityTypes: { byLou: { lei → { typeName → count } } },
+
+  // From data/lou-home-countries.json (monthly pipeline)
+  louHomeCountries: { lei → 'CC' },  // proxy from jurisdictions if file not yet generated
+
+  // From data/regulatory-context.json (static)
+  regulatoryContext: { 'CC' → { name, regulations, adoptionLevel, estimatedEntities } },
 }
 ```
 
 ### Boot sequence
 
 1. Show loading overlay
-2. Fetch LOUs + RAs + `data/daily-stats.json` + `data/history.json` in parallel
-3. Build `louMap` and `rasByLou`
-4. Fetch 40 jurisdiction lists in parallel (`Promise.all`)
+2. Parallel: fetch all LOUs, all RAs, all 8 local JSON data files
+3. Build `louMap`, `rasByLou`
+4. Fetch 40 jurisdiction lists in parallel
 5. Build `countryCoverage`
-6. Hide overlay → render Dashboard
+6. Proxy `louHomeCountries` from jurisdictions if monthly pipeline hasn't run
+7. Hide overlay → render Dashboard
 
 ### Lazy view init
-
-Each view's `init()` is only called the first time a user clicks that tab. Subsequent clicks do not re-render. Tracked via `_initializedViews` object in `app.js`.
+Each view's `init()` is called only on first tab click. Tracked via `_initializedViews` in `app.js`.
 
 ---
 
@@ -148,109 +214,125 @@ Each view's `init()` is only called the first time a user clicks that tab. Subse
 | `GET https://api.gleif.org/api/v1/lei-issuers?page[size]=100` | All LOUs |
 | `GET https://api.gleif.org/api/v1/registration-agents?page[size]=100` | All RAs |
 | `GET https://api.gleif.org/api/v1/lei-issuers/{lei}/jurisdictions?page[size]=300` | Per-LOU jurisdictions |
+| `GET https://goldencopy.gleif.org/api/v2/golden-copies/publishes` | Latest file metadata + URLs |
 
 ### Known quirks
 
-- **`/statistics/leis` returns 404** — this endpoint does not exist despite being referenced in some GLEIF docs. Trend data is derived from Golden Copy delta files instead.
-- **Bracket notation in URLs** — GLEIF uses JSON:API style `page[size]=100`. Do NOT use `URLSearchParams` as it percent-encodes `[` → `%5B` and breaks the API. Use template literals directly.
-- **40 parallel jurisdiction fetches** — all jurisdiction lists are fetched concurrently on boot. GLEIF's rate limits are generous; this completes in 2-4s in practice.
-- **CORS** — GLEIF API supports browser `fetch()` directly. No proxy needed.
-
-### Golden Copy delta endpoint
-
-```
-GET https://goldencopy-next.gleif.org/api/v2/golden-copies/publishes/lei2/latest.csv?delta=LastDay
-```
-- Returns HTTP 302 redirect to a ZIP file
-- Requires following redirects (`curl -L`)
-- No authentication required
-- Delta types: `IntraDay` (8h), `LastDay` (24h), `LastWeek`, `LastMonth`
+- **Bracket notation in URLs** — GLEIF uses JSON:API style `page[size]=100`. Use template literals directly, not `URLSearchParams` (it percent-encodes brackets → API breaks).
+- **GeoJSON country codes** — The `datasets/geo-countries` GeoJSON uses `ISO3166-1-Alpha-2` as the property key (NOT `ISO_A2` or `iso_a2`). The `getCountryCode()` function in `map.js` checks this first.
+- **40 parallel jurisdiction fetches** — GLEIF's rate limits are generous; this completes in 2–4s.
+- **CORS** — GLEIF REST API supports browser `fetch()` directly; no proxy needed.
+- **Golden Copy URL** — Always use `goldencopy.gleif.org` (NOT `goldencopy-next.gleif.org`). URLs are dynamic (include date/ID); resolve them from the publishes API at runtime.
 
 ---
 
 ## Key Design Decisions
 
+### Why colour map by daily issuance volume, not LOU count?
+The GLEIF jurisdictions API returns all countries a LOU is *licensed* to operate in. Most LOUs have global accreditation, meaning every country shows 3+ LOUs — a uniform cyan map with no information. Switching to actual daily issuance volume (`stats.byCountry`) gives a meaningful choropleth showing real market activity.
+
 ### Why vis.js Network over D3?
-D3's force-directed graph requires 150-200 lines of setup (SVG, scales, force simulation, drag). vis.js wraps all of that into a data-in/render-out API that works in ~30 lines. For a beginner project, vis.js is the right call.
+D3's force graph requires ~200 lines of SVG, scales, and simulation code. vis.js wraps it into a data-in/render-out API in ~30 lines. Right choice for a beginner project that needs to ship.
 
-### Why GitHub Actions for trend data?
-The GLEIF Golden Copy delta files are large ZIP-compressed CSVs (50-200MB). Loading and parsing them in the browser would be extremely slow and would block rendering. GitHub Actions processes them server-side and commits a small aggregated JSON (~10KB) that the frontend reads as a static file. This keeps the frontend purely static while giving real data.
+### Why GitHub Actions for pipeline, not a server?
+Golden Copy delta files are large (1–500MB). A static site cannot process them browser-side. GitHub Actions downloads, processes, and commits tiny JSON outputs (~100KB total). The entire site stays static and hosts for free on GitHub Pages.
 
-### Why sessionStorage for caching?
-`sessionStorage` clears on browser close, which means the data always reflects the current state of GLEIF. `localStorage` would cache stale LOU/RA data indefinitely. The 5MB sessionStorage limit is sufficient for the full dataset (~400KB of JSON).
+### Why `cache: 'no-store'` for local JSON fetches?
+After running `fetch_local.py` or the pipeline, the browser needs to pick up freshly generated files. Without `no-store`, Chrome caches the previous JSON (even placeholder files) and the dashboard keeps showing `—`.
 
-### Why no ES modules (`import`/`export`)?
-ES modules require a server to serve `type="module"` scripts correctly (CORS issues with `file://`). Since this project can be opened directly or via a simple Python server, the `window.App` namespace pattern avoids this complexity while keeping files cleanly separated.
-
-### Why Tabulator over DataTables?
-DataTables requires jQuery. This project avoids jQuery (consistent with the South Park project's conventions). Tabulator is a modern, jQuery-free alternative with equal or better functionality.
-
-### Why NASDAQ design theme?
-The user requested a professional fintech style similar to NASDAQ. The dark navy background (`#0a0e1a`), electric blue accent (`#00d4ff`), and green/red delta indicators are characteristic of financial market data displays.
+### Why Python only (no npm/Node for scripts)?
+Keeps the toolchain minimal. All processing uses only Python standard library (`csv`, `json`, `zipfile`, `urllib`). No `pip install` required.
 
 ---
 
 ## CSS Conventions
 
-- All colors defined as CSS variables in `:root` (prefix `--`)
-- Dark theme throughout — `--bg-primary: #0a0e1a`
-- Tabulator dark theme overrides use `!important` (necessary to override Tabulator's inline styles)
-- Cache busting: `style.css?v=1` — increment `v` when making CSS changes that might be cached
+- All theme colors as CSS variables in `:root`; prefix: `--sp-` for theme, `--` for generic
+- Cache-buster on `style.css?v=5` — increment `v` when making significant CSS changes
+- All JS scripts have `?v=N` cache-busters too; currently at `v=2` or `v=3`
+- Tabulator dark theme: use `tabulator_midnight.min.css` as base (not the default light theme)
+- Tabulator cell/row backgrounds use solid hex colors (not transparent) to avoid compositing issues
 
 ---
 
-## GitHub Actions Pipeline
+## GitHub Actions Pipelines
 
-### Trigger
-- Automatic: daily at 08:00 UTC
-- Manual: GitHub Actions UI → "Update LEI Statistics" → "Run workflow" button
+### Daily delta (`update-stats.yml`, 08:00 UTC)
+1. Fetch current download URL from `goldencopy.gleif.org/api/v2/golden-copies/publishes`
+2. Download LastDay delta ZIP (~1–2MB)
+3. Unzip, run `scripts/process_delta.py`
+4. Commit `data/daily-stats.json` + `data/history.json` (only if changed)
 
-### What it does
-1. Downloads GLEIF Golden Copy LastDay delta (ZIP)
-2. Unzips and processes with `scripts/process_delta.py`
-3. Writes `data/daily-stats.json` (today's snapshot) and appends to `data/history.json`
-4. Commits and pushes — automatically triggers GitHub Pages redeploy
+### Monthly full (`update-full.yml`, 1st of month 07:00 UTC)
+1. Fetch current full file URL from publishes API
+2. Download full Golden Copy ZIP (~450MB)
+3. Unzip, run `scripts/process_full.py` (streaming, ~3.2M records)
+4. Commit 5 files: `market-share.json`, `market-share-history.json`, `entity-types.json`, `renewal-pipeline.json`, `lou-home-countries.json`
 
-### Cost
-~1-2 minutes per run × 30 days = ~45 minutes/month. GitHub Actions free tier: 2,000 minutes/month for public repos. Total cost: **$0**.
+**Cost:** ~2 min/day × 30 = 60 min/month. GitHub free tier: 2,000 min/month. **Total cost: $0.**
 
 ---
 
 ## Session History
 
+### Session 3 — Data bootstrap, map contrast, network contrast (2026-04-02)
+
+**Problem: wrong GLEIF Golden Copy URL**
+- Original code used `goldencopy-next.gleif.org` — this domain does not resolve
+- Correct domain: `goldencopy.gleif.org`; use the publishes API for dynamic URLs
+- Fixed in both GitHub Actions workflows and new local bootstrap script
+
+**New: `scripts/fetch_local.py`**
+- Downloads and processes Golden Copy locally without needing GitHub Actions
+- Uses stdlib only (`urllib`, `zipfile`, `subprocess`) — no pip required
+- Usage: `python scripts/fetch_local.py` (delta only) or `--full` (also market share)
+- Shows progress bar, cleans up ZIP + extracted CSV after processing
+
+**Map — coverage mode overhaul**
+- Fixed `getCountryCode()` — was looking for `ISO_A2`; GeoJSON actually uses `ISO3166-1-Alpha-2` → every country returned null, all rendered as darkest shade
+- Switched coverage metric from LOU accreditation count (all countries show 3+, uniform cyan) to actual daily issuance volume — 5-tier scale: 0 / <50 / 50-299 / 300-999 / 1000+
+- New coverage colors: dark slate (0), dark blue, vivid blue, sky blue, bright cyan — all high-contrast on the dark CartoDB basemap
+- Opportunity mode: softer amber/orange palette (was flat green/yellow)
+- Hover: white border at weight 2.5 for clear country highlighting
+- Legend updated to "Daily LEIs" with tier labels
+
+**Network graph contrast**
+- Edges: `#1e2a3a` (near-invisible on `#080c17` bg) → `#1e4060` at 85% opacity, width 1.2px
+- RA nodes: dark grey blobs → green spectrum (#1a9a60 inactive → #00e676 active); clearly distinct from LOU cyan
+- RA font: dim grey size 10 → brightness 160–235 scaled by activity, size 11, strokeWidth 3
+- LOU font: white (#ffffff), size 13, strokeWidth 3 for readability on dark canvas
+
+**Data: initial Golden Copy loaded**
+- Ran `fetch_local.py --full`; processed 3,269,116 records from 2026-04-02 Golden Copy
+- `market-share.json`: 1,873,774 active LEIs globally, 40 LOUs
+- All 7 data files committed to repo; dashboard now shows real numbers
+
+**Bug fix: browser caching of JSON data files**
+- Added `cache: 'no-store'` to `loadLocalJson()` in `api.js`
+- Prevents stale placeholder files from being served after pipeline runs
+
 ### Session 2 — Full requirements implementation (2026-03-31)
-Implemented all 21 strategic requirements (REQ-01 to REQ-21) identified in the gap analysis:
+Implemented all 21 strategic requirements (REQ-01 to REQ-21) identified in the gap analysis for an aspiring LOU:
 
-**Data pipeline additions (REQ-01, REQ-02, REQ-04, REQ-05, REQ-06, REQ-09, REQ-17, REQ-18):**
-- `scripts/process_delta.py` — added `byLouByCountry`, `byLouStatus`, `transfers.outflows`, `statusBreakdown` per-day aggregations
-- `scripts/process_full.py` — new full Golden Copy processor (streaming CSV): writes `market-share.json`, `market-share-history.json`, `entity-types.json`, `renewal-pipeline.json`, `lou-home-countries.json`
-- `.github/workflows/update-full.yml` — monthly workflow (1st of month, 07:00 UTC) for full Golden Copy processing
-
-**New data files (REQ-03, REQ-07, REQ-08, REQ-21):**
-- `data/regulatory-context.json` — static file with 25 jurisdictions, regulations, adoption levels
-- Placeholder files for all 5 pipeline-generated JSON files
-
-**Frontend — new views:**
-- `views/intelligence.js` — Market Intelligence tab: insight bullets, country opportunity scores (0-100), whitespace countries, RA coverage gaps, regulatory context table
-- `views/lou-profile.js` — Full-screen LOU profile overlay: 4 tabs (Overview, RA Network, Geography, Trends), KPI grid, status breakdown bar, renewal pipeline, market share history chart
-- `views/comparison.js` — Side-by-side LOU comparison modal (up to 4 LOUs), horizontal bar chart
-
-**Frontend — updated views:**
-- `views/map.js` — Added Coverage/Opportunity mode toggle; opportunity colors by composite score; popup shows opportunity score badge; LOU names in popups link to profile
-- `views/lou-table.js` — Added Market Share % and Lapse Rate columns; compare checkbox column; CSV export; LOU name clicks open profile overlay
-- `views/ra-table.js` — Added Loyalty column (Exclusive/Dual/Multi); multi-LOU filter toggle; CSV export; LOU tags in rows link to profiles
-- `views/trends.js` — Added Chart 5 (Market Share Over Time, top 5 LOUs) and Chart 6 (Status Breakdown stacked bar, last 90 days)
-- `views/network.js` — RA node size/color weighted by estimated activity; "View Full Profile" button in LOU sidebar; "View Parent LOU Profile" button in RA sidebar
-- `app.js` — Global search (LOUs/RAs/countries, max 8 results, category badges, click-to-navigate); Intelligence tab routing
-
-**CSS (v=6):** Added search-result-label/sub, status-seg, profile-insight, profile-kpi KPI aliases.
-
-**`api.js`:** Extended `App.data` with 6 new fields; `loadLocalStats()` loads all 8 JSON files in parallel; proxy `louHomeCountries` from jurisdictions when pipeline not yet run.
+- `scripts/process_delta.py` — added `byLouByCountry`, `byLouStatus`, `transfers`, `statusBreakdown`
+- `scripts/process_full.py` — new full Golden Copy processor (streaming CSV, ~3M records)
+- `.github/workflows/update-full.yml` — monthly pipeline
+- `data/regulatory-context.json` — static file with 25 jurisdictions
+- `views/intelligence.js` — Intelligence tab (7th tab): insights, opportunity scores, whitespace, RA gaps, regulatory table
+- `views/lou-profile.js` — Full-screen LOU profile overlay with 4 tabs
+- `views/comparison.js` — Side-by-side LOU comparison modal (up to 4 LOUs)
+- `views/map.js` — Coverage/Opportunity mode toggle; LOU names in popups link to profile
+- `views/lou-table.js` — Market share %, lapse rate, compare checkboxes, CSV export, clickable LOU names
+- `views/ra-table.js` — Loyalty badges (Exclusive/Dual/Multi), multi-LOU filter, CSV export
+- `views/trends.js` — Charts 5 (market share over time) and 6 (status breakdown stacked bar)
+- `views/network.js` — RA activity weighting, "View Full Profile" buttons in sidebar
+- `app.js` — Global search (LOUs/RAs/countries, category badges, click-to-navigate)
+- `api.js` — `loadLocalStats()` loads all 8 JSON files; proxy `louHomeCountries`
 
 ### Session 1 — Initial build (2026-03-31)
-Built the entire application from scratch based on the approved plan:
+Built the entire application from scratch:
 - Project scaffold: `index.html`, `style.css`, `api.js`, `app.js`
-- All 6 views: Dashboard, World Map, Network Graph, LOU Directory, RA Directory, Trends
-- GitHub Actions data pipeline + `scripts/process_delta.py`
-- Placeholder `data/daily-stats.json` and `data/history.json`
+- 6 views: Dashboard, World Map, Network Graph, LOU Directory, RA Directory, Trends
+- GitHub Actions daily pipeline + `scripts/process_delta.py`
+- NASDAQ dark theme with CSS variables
 - `CLAUDE.md` documentation
