@@ -75,7 +75,8 @@ async function fetchAllPages(path) {
 // ---- Safe local JSON fetch (no error if file missing/placeholder) ----
 async function loadLocalJson(path, fallback) {
   try {
-    var res = await fetch(path);
+    // cache:reload ensures the browser always fetches a fresh copy of data files
+    var res = await fetch(path, { cache: 'no-store' });
     if (!res.ok) return fallback;
     var json = await res.json();
     // If it's a placeholder with _note and null date, treat as empty

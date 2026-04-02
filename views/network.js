@@ -53,11 +53,11 @@ App.views.initNetwork = function() {
       size: size,
       color: {
         background: '#00d4ff',
-        border: '#0099bb',
-        highlight: { background: '#33ddff', border: '#00d4ff' },
-        hover: { background: '#33ddff', border: '#00d4ff' },
+        border: '#00a8cc',
+        highlight: { background: '#66e8ff', border: '#00d4ff' },
+        hover: { background: '#33ddff', border: '#00c8f0' },
       },
-      font: { color: '#e8eaf0', size: 12, face: 'Inter, sans-serif', strokeWidth: 2, strokeColor: '#080c17' },
+      font: { color: '#ffffff', size: 13, face: 'Inter, sans-serif', strokeWidth: 3, strokeColor: '#050810' },
       title: name,
       _type: 'lou',
       _data: lou,
@@ -73,12 +73,21 @@ App.views.initNetwork = function() {
     // Activity proxy: parent LOU 30d activity shared equally among its RAs
     var raActivity = raCountForParent > 0 ? parentActivity / raCountForParent : 0;
     var activityRatio = maxLouActivity > 0 ? raActivity / maxLouActivity : 0;
-    // Size: 8-16 based on activity
-    var raSize = 8 + activityRatio * 8;
-    // Color: darker grey when inactive, lighter when active
-    var greyVal = Math.round(42 + activityRatio * 80); // 42 to 122
-    var greyHex = greyVal.toString(16).padStart(2, '0');
-    var raBg = '#' + greyHex + greyHex + (Math.min(255, greyVal + 40)).toString(16).padStart(2, '0');
+    // Size: 9–18 based on activity
+    var raSize = 9 + activityRatio * 9;
+    // Color: green spectrum — dim teal-green when inactive, bright green when active
+    // Inactive: #1a9a60  Active: #00e676  (clearly distinct from LOU cyan)
+    var gR = Math.round(26  + activityRatio * (0   - 26));
+    var gG = Math.round(154 + activityRatio * (230 - 154));
+    var gB = Math.round(96  + activityRatio * (118 - 96));
+    var raBg     = '#' + gR.toString(16).padStart(2,'0') + gG.toString(16).padStart(2,'0') + gB.toString(16).padStart(2,'0');
+    var raBorder = '#' + Math.round(gR * 0.6).toString(16).padStart(2,'0') +
+                         Math.round(gG * 0.6).toString(16).padStart(2,'0') +
+                         Math.round(gB * 0.6).toString(16).padStart(2,'0');
+    // Font brightness scales with activity so labels are readable at all sizes
+    var fontBrightness = Math.round(160 + activityRatio * 75); // 160–235
+    var fHex = fontBrightness.toString(16).padStart(2,'0');
+    var raFontColor = '#' + fHex + fHex + fHex;
 
     nodes.add({
       id: 'ra_' + (ra.id || i),
@@ -87,11 +96,11 @@ App.views.initNetwork = function() {
       size: raSize,
       color: {
         background: raBg,
-        border: '#3a5070',
-        highlight: { background: '#8892a4', border: '#aab2c0' },
-        hover: { background: '#3a5070', border: '#8892a4' },
+        border: raBorder,
+        highlight: { background: '#00e676', border: '#00b854' },
+        hover: { background: '#00c864', border: '#00a050' },
       },
-      font: { color: '#8892a4', size: 10, face: 'Inter, sans-serif', strokeWidth: 2, strokeColor: '#080c17' },
+      font: { color: raFontColor, size: 11, face: 'Inter, sans-serif', strokeWidth: 3, strokeColor: '#080c17' },
       title: name,
       _type: 'ra',
       _data: ra,
@@ -101,9 +110,9 @@ App.views.initNetwork = function() {
       edges.add({
         from: 'ra_' + (ra.id || i),
         to: louLei,
-        color: { color: '#1e2a3a', highlight: '#00d4ff', hover: '#2a3a50' },
-        width: 1,
-        hoverWidth: 2,
+        color: { color: '#1e4060', highlight: '#00d4ff', hover: '#2a5a80', opacity: 0.85 },
+        width: 1.2,
+        hoverWidth: 2.5,
         smooth: { type: 'continuous', roundness: 0.2 },
       });
     }
