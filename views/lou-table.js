@@ -153,7 +153,7 @@ App.views.initLouTable = function() {
         formatter: function(cell) {
           var v = cell.getValue();
           if (v == null) return '<span style="color:var(--text-secondary)">\u2014</span>';
-          return '<span class="cell-number">' + (v * 100).toFixed(2) + '%</span>';
+          return '<span class="cell-number">' + v.toFixed(2) + '%</span>';
         },
       },
       {
