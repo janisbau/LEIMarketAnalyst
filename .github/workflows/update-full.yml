@@ -1,4 +1,5 @@
 name: Update Full Market Share (Monthly)
+# Processes GLEIF full Golden Copy and commits market-share data
 
 on:
   schedule:

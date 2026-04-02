@@ -1,4 +1,5 @@
 name: Update LEI Statistics
+# Processes GLEIF Golden Copy daily delta and commits aggregated JSON
 
 on:
   schedule:
