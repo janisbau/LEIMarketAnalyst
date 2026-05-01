@@ -164,5 +164,171 @@
         "share": 0.013
       }
     }
+  },
+  {
+    "month": "2026-05",
+    "totalActive": 1889986,
+    "byLou": {
+      "5493001KJTIIGC8Y1R12": {
+        "active": 226385,
+        "share": 11.978
+      },
+      "5299000J2N45DDNE4Y28": {
+        "active": 124900,
+        "share": 6.609
+      },
+      "39120001KULK7200U106": {
+        "active": 99746,
+        "share": 5.278
+      },
+      "529900F6BNUR3RJ2WH29": {
+        "active": 159559,
+        "share": 8.442
+      },
+      "029200067A7K6CH0H586": {
+        "active": 287,
+        "share": 0.015
+      },
+      "213800WAVVOPS85N2205": {
+        "active": 106272,
+        "share": 5.623
+      },
+      "529900T8BM49AURSDO55": {
+        "active": 340701,
+        "share": 18.027
+      },
+      "549300O897ZC5H7CY412": {
+        "active": 78252,
+        "share": 4.14
+      },
+      "097900BEFH0000000217": {
+        "active": 2921,
+        "share": 0.155
+      },
+      "52990034RLKT0WSOAM90": {
+        "active": 31329,
+        "share": 1.658
+      },
+      "254900LXHEVKYGERER05": {
+        "active": 2225,
+        "share": 0.118
+      },
+      "253400M18U5TB02TW421": {
+        "active": 492,
+        "share": 0.026
+      },
+      "7478000050A040C0D041": {
+        "active": 1482,
+        "share": 0.078
+      },
+      "315700LK78Z7C0WMIL03": {
+        "active": 16092,
+        "share": 0.851
+      },
+      "48510000JZ17NWGUA510": {
+        "active": 3642,
+        "share": 0.193
+      },
+      "485100001PLJJ09NZT59": {
+        "active": 69511,
+        "share": 3.678
+      },
+      "353800279ADEFGKNTV65": {
+        "active": 10026,
+        "share": 0.53
+      },
+      "969500Q2MA9VBQ8BG884": {
+        "active": 69436,
+        "share": 3.674
+      },
+      "98450045AN5EB5FDC780": {
+        "active": 7814,
+        "share": 0.413
+      },
+      "743700OO8O2N3TQKJC81": {
+        "active": 38439,
+        "share": 2.034
+      },
+      "506700LOLO7M6V0E4247": {
+        "active": 7664,
+        "share": 0.406
+      },
+      "635400DZBUIMTBCXGA12": {
+        "active": 7480,
+        "share": 0.396
+      },
+      "259400L3KBYEVNHEJF55": {
+        "active": 21514,
+        "share": 1.138
+      },
+      "815600EAD78C57FCE690": {
+        "active": 133634,
+        "share": 7.071
+      },
+      "959800R2X69K6Y6MX775": {
+        "active": 81841,
+        "share": 4.33
+      },
+      "724500A93Z8V1MJK5349": {
+        "active": 108449,
+        "share": 5.738
+      },
+      "894500IIP432AHQ64V02": {
+        "active": 10335,
+        "share": 0.547
+      },
+      "789000TVSB96MCOKSB52": {
+        "active": 5929,
+        "share": 0.314
+      },
+      "9884008RRMX1X5HV6625": {
+        "active": 1031,
+        "share": 0.055
+      },
+      "558600FNC30A8J9EGQ54": {
+        "active": 3187,
+        "share": 0.169
+      },
+      "335800FVH4MOKZS9VH40": {
+        "active": 113699,
+        "share": 6.016
+      },
+      "254900PMALKJRL1YGQ18": {
+        "active": 92,
+        "share": 0.005
+      },
+      "655600IJ8LS3CCDA4421": {
+        "active": 2749,
+        "share": 0.145
+      },
+      "378900F4A0A690EA6735": {
+        "active": 598,
+        "share": 0.032
+      },
+      "4117IB8J63IUO2SES575": {
+        "active": 67,
+        "share": 0.004
+      },
+      "4469000001AVO26P9X86": {
+        "active": 1935,
+        "share": 0.102
+      },
+      "EVK05KS7XY1DEII3R011": {
+        "active": 0,
+        "share": 0.0
+      },
+      "335800NFZPTMGTPAHE42": {
+        "active": 0,
+        "share": 0.0
+      },
+      "815600F58F7382929F40": {
+        "active": 15,
+        "share": 0.001
+      },
+      "984500ID493BDCR4B368": {
+        "active": 256,
+        "share": 0.014
+      }
+    }
   }
 ]
