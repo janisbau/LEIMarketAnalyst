@@ -1,506 +1,470 @@
 {
-  "totalDelta": 5350,
+  "totalDelta": 4303,
   "byLou": {
-    "097900BEFH0000000217": 4,
-    "98450045AN5EB5FDC780": 3,
-    "213800WAVVOPS85N2205": 132,
-    "635400DZBUIMTBCXGA12": 125,
-    "529900F6BNUR3RJ2WH29": 374,
-    "529900T8BM49AURSDO55": 834,
-    "549300O897ZC5H7CY412": 42,
-    "485100001PLJJ09NZT59": 314,
-    "39120001KULK7200U106": 120,
-    "52990034RLKT0WSOAM90": 7,
-    "5493001KJTIIGC8Y1R12": 108,
-    "259400L3KBYEVNHEJF55": 89,
-    "335800FVH4MOKZS9VH40": 460,
-    "959800R2X69K6Y6MX775": 265,
-    "724500A93Z8V1MJK5349": 176,
-    "655600IJ8LS3CCDA4421": 11,
-    "353800279ADEFGKNTV65": 22,
-    "5299000J2N45DDNE4Y28": 142,
-    "4469000001AVO26P9X86": 16,
-    "506700LOLO7M6V0E4247": 7,
+    "029200067A7K6CH0H586": 2,
+    "097900BEFH0000000217": 6,
+    "98450045AN5EB5FDC780": 252,
+    "213800WAVVOPS85N2205": 77,
+    "529900T8BM49AURSDO55": 799,
+    "635400DZBUIMTBCXGA12": 135,
+    "529900F6BNUR3RJ2WH29": 248,
+    "549300O897ZC5H7CY412": 242,
+    "655600IJ8LS3CCDA4421": 9,
+    "5299000J2N45DDNE4Y28": 100,
+    "52990034RLKT0WSOAM90": 9,
+    "5493001KJTIIGC8Y1R12": 91,
+    "259400L3KBYEVNHEJF55": 29,
+    "485100001PLJJ09NZT59": 182,
+    "254900LXHEVKYGERER05": 6,
+    "335800FVH4MOKZS9VH40": 159,
+    "353800279ADEFGKNTV65": 19,
+    "39120001KULK7200U106": 126,
+    "4469000001AVO26P9X86": 12,
+    "48510000JZ17NWGUA510": 1,
+    "506700LOLO7M6V0E4247": 9,
     "894500IIP432AHQ64V02": 6,
-    "815600EAD78C57FCE690": 672,
-    "969500Q2MA9VBQ8BG884": 1287,
-    "558600FNC30A8J9EGQ54": 4,
-    "743700OO8O2N3TQKJC81": 118,
+    "815600EAD78C57FCE690": 363,
+    "969500Q2MA9VBQ8BG884": 998,
+    "724500A93Z8V1MJK5349": 134,
+    "558600FNC30A8J9EGQ54": 103,
+    "743700OO8O2N3TQKJC81": 93,
     "747800R0J5YBJED3N877": 10,
-    "789000TVSB96MCOKSB52": 1,
-    "48510000JZ17NWGUA510": 1
+    "959800R2X69K6Y6MX775": 83
   },
   "byCountry": {
-    "SK": 5,
-    "SE": 92,
-    "NO": 48,
-    "GB": 123,
-    "VG": 18,
-    "GG": 12,
-    "GR": 140,
-    "NL": 194,
-    "CH": 14,
-    "PA": 4,
-    "MU": 8,
-    "LU": 35,
-    "MT": 3,
-    "JE": 3,
-    "MY": 7,
-    "IM": 2,
-    "PT": 18,
-    "MH": 5,
-    "CY": 7,
-    "BS": 1,
-    "FR": 1339,
-    "AE": 12,
-    "LC": 1,
-    "KY": 14,
-    "HU": 14,
-    "US": 104,
-    "DK": 66,
-    "IL": 2,
-    "AU": 49,
-    "CZ": 10,
-    "HK": 6,
-    "IN": 1237,
-    "SG": 4,
-    "MX": 18,
-    "PL": 89,
-    "CA": 27,
-    "ES": 277,
-    "ZA": 2,
-    "BE": 39,
-    "RO": 4,
-    "EE": 32,
-    "QA": 1,
-    "AF": 1,
-    "CN": 10,
-    "JP": 23,
-    "DE": 238,
-    "BG": 6,
-    "AT": 48,
-    "LR": 2,
-    "IT": 739,
-    "BR": 3,
-    "LI": 5,
-    "MK": 2,
-    "SV": 1,
-    "GI": 1,
-    "BJ": 1,
-    "IE": 21,
-    "FI": 124,
-    "SA": 3,
-    "BH": 1,
-    "FO": 1,
-    "LT": 9,
-    "IS": 1,
-    "CW": 1,
-    "HR": 10,
-    "TR": 4,
-    "PG": 1,
-    "EG": 1,
+    "NG": 2,
+    "SK": 7,
+    "GB": 98,
+    "DK": 284,
+    "NO": 164,
+    "DE": 237,
+    "SE": 182,
+    "VG": 14,
+    "GR": 133,
+    "IE": 32,
+    "IM": 3,
+    "AU": 47,
+    "PA": 7,
+    "LU": 48,
+    "CY": 5,
+    "MY": 2,
+    "BS": 5,
+    "MU": 4,
+    "SG": 10,
+    "GG": 2,
+    "MT": 2,
+    "HK": 12,
+    "KY": 16,
+    "PT": 11,
+    "FR": 1031,
+    "HU": 18,
+    "EE": 41,
+    "IN": 715,
+    "CA": 17,
+    "PL": 31,
+    "US": 67,
+    "AE": 5,
+    "BR": 2,
+    "NZ": 3,
+    "RO": 6,
     "AM": 1,
+    "CZ": 10,
+    "IL": 1,
+    "CN": 4,
+    "JP": 19,
+    "AT": 32,
+    "MX": 12,
+    "BG": 6,
+    "SI": 1,
+    "CH": 11,
+    "LR": 2,
+    "LI": 7,
+    "IT": 412,
+    "BE": 43,
+    "ES": 87,
+    "IS": 15,
+    "BJ": 1,
+    "PE": 1,
+    "NL": 145,
+    "BM": 2,
+    "SA": 101,
+    "FI": 107,
+    "FO": 1,
+    "LT": 5,
+    "LV": 2,
+    "HR": 10,
     "CL": 1,
-    "GL": 1,
-    "RS": 1,
-    "CK": 1,
-    "PR": 1,
-    "CO": 1
+    "AR": 1
   },
   "byLouByCountry": {
+    "029200067A7K6CH0H586": {
+      "NG": 2
+    },
     "097900BEFH0000000217": {
-      "SK": 4
+      "SK": 6
     },
     "98450045AN5EB5FDC780": {
-      "SE": 1,
-      "NO": 1,
-      "DK": 1
+      "GB": 4,
+      "DK": 157,
+      "NO": 69,
+      "DE": 3,
+      "SE": 19
     },
     "213800WAVVOPS85N2205": {
-      "GB": 54,
-      "VG": 3,
-      "GG": 11,
-      "GR": 28,
-      "NL": 1,
+      "VG": 4,
+      "IM": 3,
+      "GB": 26,
+      "GR": 23,
       "PA": 4,
-      "MU": 1,
       "LU": 5,
-      "JE": 2,
-      "MY": 3,
-      "IM": 2,
-      "PT": 3,
-      "MH": 1,
-      "CY": 4,
+      "CY": 2,
+      "MY": 2,
       "BS": 1,
-      "FR": 1,
-      "AE": 2,
-      "LC": 1,
+      "SG": 1,
+      "GG": 1,
+      "MT": 1,
       "KY": 2,
-      "GI": 1,
       "BJ": 1,
-      "ES": 1
+      "AT": 1
+    },
+    "529900T8BM49AURSDO55": {
+      "GB": 51,
+      "IE": 8,
+      "AU": 38,
+      "DK": 77,
+      "MU": 4,
+      "BS": 1,
+      "GR": 4,
+      "LU": 11,
+      "EE": 35,
+      "CY": 2,
+      "IN": 318,
+      "VG": 1,
+      "NO": 21,
+      "US": 17,
+      "HU": 9,
+      "DE": 41,
+      "BG": 5,
+      "AT": 13,
+      "SE": 28,
+      "HK": 6,
+      "BE": 24,
+      "PE": 1,
+      "CA": 2,
+      "IS": 3,
+      "NL": 2,
+      "IT": 26,
+      "FR": 11,
+      "ES": 4,
+      "LT": 1,
+      "LV": 1,
+      "FI": 8,
+      "BM": 1,
+      "PT": 5,
+      "SG": 8,
+      "CZ": 3,
+      "AE": 2,
+      "NZ": 2,
+      "KY": 2,
+      "PL": 1,
+      "AR": 1,
+      "SK": 1
     },
     "635400DZBUIMTBCXGA12": {
       "GR": 106,
-      "IE": 13,
+      "IE": 22,
       "GB": 3,
       "BG": 1,
-      "LU": 2
+      "LU": 2,
+      "KY": 1
     },
     "529900F6BNUR3RJ2WH29": {
-      "GB": 15,
-      "CH": 3,
-      "LU": 8,
-      "DK": 9,
-      "NO": 17,
-      "IN": 121,
-      "AU": 9,
-      "BE": 14,
-      "SE": 18,
-      "DE": 26,
-      "HU": 5,
-      "PT": 3,
-      "US": 6,
-      "CA": 15,
-      "FI": 1,
-      "FR": 39,
-      "NL": 7,
-      "IE": 4,
-      "IT": 24,
-      "CZ": 4,
-      "EE": 5,
-      "PG": 1,
-      "ES": 11,
-      "TR": 1,
-      "KY": 1,
-      "VG": 2,
-      "MH": 2,
-      "EG": 1,
-      "BG": 1,
-      "BR": 1
-    },
-    "529900T8BM49AURSDO55": {
-      "MT": 2,
-      "MU": 7,
-      "GR": 6,
-      "GB": 37,
-      "LU": 9,
-      "AU": 33,
-      "CY": 3,
-      "NO": 20,
-      "DK": 46,
-      "IN": 394,
-      "VG": 3,
-      "US": 19,
-      "EE": 25,
-      "RO": 3,
-      "DE": 31,
-      "BG": 3,
-      "AT": 16,
-      "MY": 3,
-      "HK": 2,
-      "SE": 39,
-      "CA": 9,
-      "KY": 4,
-      "MH": 2,
-      "IE": 4,
-      "NL": 3,
-      "FI": 5,
-      "IT": 35,
-      "ES": 2,
-      "TR": 2,
-      "BE": 13,
-      "GL": 1,
-      "JE": 1,
+      "GB": 7,
+      "DK": 12,
+      "FR": 19,
+      "LU": 4,
       "HU": 4,
-      "MX": 1,
-      "FR": 10,
-      "RS": 1,
-      "PT": 10,
-      "CZ": 1,
-      "AE": 10,
+      "SE": 23,
+      "NO": 7,
+      "IN": 87,
+      "DE": 18,
+      "CH": 1,
+      "PT": 3,
+      "AU": 2,
+      "CA": 14,
+      "IT": 15,
+      "BE": 10,
+      "US": 5,
+      "FI": 4,
+      "EE": 2,
+      "NL": 5,
       "PL": 1,
-      "CK": 1,
-      "PR": 1,
-      "SG": 3,
-      "CO": 1,
-      "LT": 4,
-      "CN": 2,
-      "BR": 1,
-      "SK": 1
+      "CZ": 2,
+      "IE": 2,
+      "ES": 1
     },
     "549300O897ZC5H7CY412": {
-      "LU": 4,
-      "NO": 10,
+      "SE": 108,
+      "LU": 16,
+      "NO": 62,
+      "DK": 34,
       "CH": 1,
-      "SE": 24,
-      "DK": 2,
-      "FO": 1
-    },
-    "485100001PLJJ09NZT59": {
-      "GB": 10,
-      "LU": 1,
-      "HU": 1,
-      "IN": 262,
-      "DK": 7,
-      "SE": 8,
-      "CZ": 4,
-      "EE": 2,
-      "LT": 5,
-      "NL": 8,
-      "BE": 2,
-      "IS": 1,
-      "DE": 2,
-      "AT": 1
-    },
-    "39120001KULK7200U106": {
-      "LU": 2,
-      "DE": 117,
-      "VG": 1
-    },
-    "52990034RLKT0WSOAM90": {
-      "HU": 3,
-      "DE": 1,
-      "HK": 1,
-      "BE": 1,
-      "MK": 1
-    },
-    "5493001KJTIIGC8Y1R12": {
-      "US": 72,
-      "IL": 2,
-      "CZ": 1,
-      "HK": 1,
-      "SG": 1,
-      "AU": 1,
-      "GB": 3,
-      "MX": 1,
-      "VG": 6,
-      "CA": 3,
-      "LU": 1,
-      "ZA": 2,
-      "MT": 1,
+      "IS": 12,
+      "CY": 1,
       "GG": 1,
+      "FI": 2,
       "IN": 1,
-      "MY": 1,
-      "KY": 6,
-      "RO": 1,
-      "QA": 1,
-      "AF": 1,
-      "AM": 1
-    },
-    "259400L3KBYEVNHEJF55": {
-      "PL": 88,
-      "HU": 1
-    },
-    "335800FVH4MOKZS9VH40": {
-      "IN": 459,
-      "JP": 1
-    },
-    "959800R2X69K6Y6MX775": {
-      "ES": 263,
-      "CL": 1,
-      "FR": 1
-    },
-    "724500A93Z8V1MJK5349": {
-      "NL": 175,
-      "CW": 1
+      "KY": 1,
+      "GB": 1,
+      "FO": 1,
+      "VG": 1
     },
     "655600IJ8LS3CCDA4421": {
-      "HK": 2,
-      "CN": 8,
-      "VG": 1
-    },
-    "353800279ADEFGKNTV65": {
-      "JP": 22
+      "HK": 5,
+      "CN": 4
     },
     "5299000J2N45DDNE4Y28": {
-      "DE": 61,
-      "AT": 31,
+      "PT": 3,
+      "DE": 49,
+      "BS": 2,
+      "AT": 17,
       "LR": 2,
-      "BG": 1,
-      "US": 7,
+      "LU": 4,
+      "LI": 7,
       "IT": 8,
-      "BR": 1,
-      "CH": 2,
       "VG": 2,
-      "LI": 5,
-      "LU": 3,
-      "BE": 3,
-      "PT": 2,
-      "MK": 1,
-      "KY": 1,
-      "SV": 1,
+      "PA": 3,
+      "ES": 1,
+      "SE": 1,
+      "FR": 1
+    },
+    "52990034RLKT0WSOAM90": {
+      "HU": 5,
+      "AU": 1,
+      "DE": 2,
+      "BE": 1
+    },
+    "5493001KJTIIGC8Y1R12": {
+      "IN": 1,
+      "VG": 6,
+      "HK": 1,
+      "KY": 10,
+      "CA": 1,
       "AU": 6,
-      "FR": 1,
-      "GB": 1,
+      "US": 45,
+      "AE": 1,
+      "MT": 1,
+      "LU": 3,
       "DK": 1,
-      "SE": 2
+      "SG": 1,
+      "BR": 2,
+      "NZ": 1,
+      "GB": 2,
+      "DE": 1,
+      "AM": 1,
+      "FR": 1,
+      "CZ": 1,
+      "EE": 1,
+      "IL": 1,
+      "NO": 1,
+      "BS": 1,
+      "BM": 1
+    },
+    "259400L3KBYEVNHEJF55": {
+      "PL": 29
+    },
+    "485100001PLJJ09NZT59": {
+      "IN": 149,
+      "DK": 3,
+      "EE": 3,
+      "NL": 5,
+      "BE": 2,
+      "CZ": 4,
+      "SE": 3,
+      "GB": 4,
+      "LT": 4,
+      "NO": 4,
+      "LV": 1
+    },
+    "254900LXHEVKYGERER05": {
+      "RO": 6
+    },
+    "335800FVH4MOKZS9VH40": {
+      "IN": 159
+    },
+    "353800279ADEFGKNTV65": {
+      "JP": 19
+    },
+    "39120001KULK7200U106": {
+      "DE": 123,
+      "AT": 1,
+      "LU": 2
     },
     "4469000001AVO26P9X86": {
-      "MX": 16
+      "MX": 12
+    },
+    "48510000JZ17NWGUA510": {
+      "SI": 1
     },
     "506700LOLO7M6V0E4247": {
-      "CH": 7
+      "CH": 9
     },
     "894500IIP432AHQ64V02": {
       "BE": 6
     },
     "815600EAD78C57FCE690": {
-      "IT": 672
+      "IT": 363
     },
     "969500Q2MA9VBQ8BG884": {
-      "FR": 1287
+      "FR": 998
+    },
+    "724500A93Z8V1MJK5349": {
+      "NL": 133,
+      "LU": 1
     },
     "558600FNC30A8J9EGQ54": {
-      "SA": 3,
-      "BH": 1
+      "SA": 101,
+      "AE": 2
     },
     "743700OO8O2N3TQKJC81": {
-      "FI": 118
+      "FI": 93
     },
     "747800R0J5YBJED3N877": {
       "HR": 10
     },
-    "789000TVSB96MCOKSB52": {
-      "TR": 1
-    },
-    "48510000JZ17NWGUA510": {
-      "CH": 1
+    "959800R2X69K6Y6MX775": {
+      "ES": 81,
+      "CL": 1,
+      "FR": 1
     }
   },
   "byLouStatus": {
+    "029200067A7K6CH0H586": {
+      "ISSUED": 2
+    },
     "097900BEFH0000000217": {
-      "LAPSED": 4
+      "LAPSED": 6
     },
     "98450045AN5EB5FDC780": {
-      "LAPSED": 3
+      "ISSUED": 249,
+      "LAPSED": 2,
+      "RETIRED": 1
     },
     "213800WAVVOPS85N2205": {
-      "LAPSED": 101,
-      "ISSUED": 31
+      "LAPSED": 77
+    },
+    "529900T8BM49AURSDO55": {
+      "ISSUED": 634,
+      "LAPSED": 165
     },
     "635400DZBUIMTBCXGA12": {
-      "ISSUED": 112,
-      "LAPSED": 4,
+      "ISSUED": 116,
+      "LAPSED": 10,
       "RETIRED": 9
     },
     "529900F6BNUR3RJ2WH29": {
-      "ISSUED": 225,
-      "PENDING_ARCHIVAL": 4,
-      "LAPSED": 144,
-      "PENDING_TRANSFER": 1
-    },
-    "529900T8BM49AURSDO55": {
-      "LAPSED": 241,
-      "ISSUED": 589,
-      "RETIRED": 4
+      "ISSUED": 191,
+      "LAPSED": 57
     },
     "549300O897ZC5H7CY412": {
-      "LAPSED": 42
-    },
-    "485100001PLJJ09NZT59": {
-      "ISSUED": 194,
-      "LAPSED": 119,
-      "PENDING_TRANSFER": 1
-    },
-    "39120001KULK7200U106": {
-      "LAPSED": 8,
-      "ISSUED": 110,
-      "PENDING_ARCHIVAL": 2
-    },
-    "52990034RLKT0WSOAM90": {
-      "LAPSED": 7
-    },
-    "5493001KJTIIGC8Y1R12": {
-      "LAPSED": 108
-    },
-    "259400L3KBYEVNHEJF55": {
-      "LAPSED": 16,
-      "ISSUED": 73
-    },
-    "335800FVH4MOKZS9VH40": {
-      "ISSUED": 334,
-      "PENDING_ARCHIVAL": 37,
-      "LAPSED": 86,
-      "PENDING_TRANSFER": 3
-    },
-    "959800R2X69K6Y6MX775": {
-      "ISSUED": 134,
-      "LAPSED": 111,
-      "RETIRED": 7,
-      "PENDING_TRANSFER": 9,
-      "PENDING_ARCHIVAL": 4
-    },
-    "724500A93Z8V1MJK5349": {
-      "ISSUED": 152,
-      "LAPSED": 24
+      "LAPSED": 48,
+      "ISSUED": 194
     },
     "655600IJ8LS3CCDA4421": {
-      "ISSUED": 7,
-      "LAPSED": 4
-    },
-    "353800279ADEFGKNTV65": {
-      "ISSUED": 22
+      "PENDING_TRANSFER": 1,
+      "LAPSED": 3,
+      "ISSUED": 5
     },
     "5299000J2N45DDNE4Y28": {
-      "ISSUED": 75,
-      "LAPSED": 67
+      "LAPSED": 44,
+      "ISSUED": 56
+    },
+    "52990034RLKT0WSOAM90": {
+      "LAPSED": 9
+    },
+    "5493001KJTIIGC8Y1R12": {
+      "LAPSED": 91
+    },
+    "259400L3KBYEVNHEJF55": {
+      "LAPSED": 11,
+      "ISSUED": 18
+    },
+    "485100001PLJJ09NZT59": {
+      "LAPSED": 117,
+      "ISSUED": 64,
+      "PENDING_ARCHIVAL": 1
+    },
+    "254900LXHEVKYGERER05": {
+      "ISSUED": 1,
+      "LAPSED": 5
+    },
+    "335800FVH4MOKZS9VH40": {
+      "ISSUED": 69,
+      "LAPSED": 90
+    },
+    "353800279ADEFGKNTV65": {
+      "ISSUED": 19
+    },
+    "39120001KULK7200U106": {
+      "ISSUED": 120,
+      "LAPSED": 6
     },
     "4469000001AVO26P9X86": {
-      "LAPSED": 13,
-      "ISSUED": 3
-    },
-    "506700LOLO7M6V0E4247": {
-      "LAPSED": 7
-    },
-    "894500IIP432AHQ64V02": {
-      "LAPSED": 4,
-      "ISSUED": 2
-    },
-    "815600EAD78C57FCE690": {
-      "ISSUED": 552,
-      "LAPSED": 119,
-      "RETIRED": 1
-    },
-    "969500Q2MA9VBQ8BG884": {
-      "ISSUED": 823,
-      "LAPSED": 412,
-      "RETIRED": 52
-    },
-    "558600FNC30A8J9EGQ54": {
-      "LAPSED": 4
-    },
-    "743700OO8O2N3TQKJC81": {
-      "ISSUED": 107,
-      "RETIRED": 3,
-      "LAPSED": 8
-    },
-    "747800R0J5YBJED3N877": {
-      "ISSUED": 7,
-      "LAPSED": 3
-    },
-    "789000TVSB96MCOKSB52": {
-      "ISSUED": 1
+      "LAPSED": 12
     },
     "48510000JZ17NWGUA510": {
       "LAPSED": 1
+    },
+    "506700LOLO7M6V0E4247": {
+      "LAPSED": 8,
+      "ISSUED": 1
+    },
+    "894500IIP432AHQ64V02": {
+      "RETIRED": 2,
+      "LAPSED": 4
+    },
+    "815600EAD78C57FCE690": {
+      "ISSUED": 247,
+      "LAPSED": 116
+    },
+    "969500Q2MA9VBQ8BG884": {
+      "ISSUED": 615,
+      "LAPSED": 337,
+      "RETIRED": 46
+    },
+    "724500A93Z8V1MJK5349": {
+      "ISSUED": 104,
+      "LAPSED": 30
+    },
+    "558600FNC30A8J9EGQ54": {
+      "ISSUED": 102,
+      "LAPSED": 1
+    },
+    "743700OO8O2N3TQKJC81": {
+      "ISSUED": 86,
+      "RETIRED": 3,
+      "LAPSED": 4
+    },
+    "747800R0J5YBJED3N877": {
+      "LAPSED": 4,
+      "ISSUED": 6
+    },
+    "959800R2X69K6Y6MX775": {
+      "LAPSED": 83
     }
   },
   "statusBreakdown": {
-    "LAPSED": 1660,
-    "ISSUED": 3553,
-    "PENDING_ARCHIVAL": 47,
-    "PENDING_TRANSFER": 14,
-    "RETIRED": 76
+    "ISSUED": 2899,
+    "LAPSED": 1341,
+    "PENDING_TRANSFER": 1,
+    "RETIRED": 61,
+    "PENDING_ARCHIVAL": 1
   },
   "transfers": {
     "outflows": {
-      "485100001PLJJ09NZT59": 1,
-      "335800FVH4MOKZS9VH40": 3,
-      "529900F6BNUR3RJ2WH29": 1,
-      "959800R2X69K6Y6MX775": 9
+      "655600IJ8LS3CCDA4421": 1
     },
     "inflows": {}
   },
-  "date": "2026-07-19"
+  "date": "2026-07-20"
 }
